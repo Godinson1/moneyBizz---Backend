@@ -1,18 +1,12 @@
 import dotenv from "dotenv"
 import express, { Request, Response, NextFunction } from "express"
 import cors from "cors"
-import { ApolloServer } from "apollo-server-express"
 import HttpStatus from "http-status-codes"
 import { ResponseError } from "./error/interface"
 import helmet from "helmet"
-import fileUpload from "express-fileupload"
-import typeDefs from "./graphql/schema"
-import resolvers from "./graphql/resolvers"
 
 //import error handler
 import { handleError } from "./error/index"
-
-import { router as AuthRoutes } from "./Authentication"
 
 dotenv.config()
 
@@ -25,21 +19,6 @@ app.use(cors())
 
 //Configure Helmet
 app.use(helmet())
-
-//enable express file upload
-app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }))
-
-const gqlServer = new ApolloServer({
-    typeDefs,
-    resolvers,
-    introspection: true,
-    playground: true
-})
-
-gqlServer.applyMiddleware({ app, path: "/graphql" })
-
-// defining routes
-app.use("/auth", AuthRoutes)
 
 // setting fall back route and message for undefined routes
 app.use((req: Request, res: Response, next: NextFunction) => {
