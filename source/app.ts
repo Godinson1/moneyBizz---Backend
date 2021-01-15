@@ -4,6 +4,8 @@ import cors from "cors"
 import HttpStatus from "http-status-codes"
 import { ResponseError } from "./error/interface"
 import helmet from "helmet"
+import { router as AuthenticationRouter } from "./Authentication"
+import { router as UserRouter } from "./User"
 
 //import error handler
 import { handleError } from "./error/index"
@@ -19,6 +21,9 @@ app.use(cors())
 
 //Configure Helmet
 app.use(helmet())
+
+app.use("/auth", AuthenticationRouter)
+app.use("/user", UserRouter)
 
 // setting fall back route and message for undefined routes
 app.use((req: Request, res: Response, next: NextFunction) => {

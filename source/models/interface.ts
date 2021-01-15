@@ -2,14 +2,16 @@ import mongoose from "mongoose"
 
 export interface IUser extends mongoose.Document {
     userID: mongoose.Types.ObjectId
-    fname: string
-    lname: string
+    firstName: string
+    lastName: string
     dateOfBirth: string
     phone: string
     email: string
     address: string
     sex: string
+    active: boolean
     profile_photo: string
+    password: string
     total_balance: number
     available_balance: number
     nameOfNextOfKin: string

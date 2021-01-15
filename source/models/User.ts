@@ -5,11 +5,11 @@ const Schema = mongoose.Schema
 
 const UserSchema = new Schema(
     {
-        fname: {
+        firstName: {
             type: String,
             required: true
         },
-        lname: {
+        lastName: {
             type: String,
             required: true
         },
@@ -34,16 +34,17 @@ const UserSchema = new Schema(
         profile_photo: {
             type: String
         },
+        password: {
+            type: String
+        },
         bvn: {
             type: Number
         },
         nameOfNextOfKin: {
-            type: String,
-            required: true
+            type: String
         },
         phoneOfNextOfKin: {
-            type: String,
-            required: true
+            type: String
         },
         total_credit: {
             type: String
@@ -62,6 +63,9 @@ const UserSchema = new Schema(
         },
         connections: {
             type: Array
+        },
+        active: {
+            type: Boolean
         }
     },
     {
