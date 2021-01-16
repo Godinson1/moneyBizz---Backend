@@ -2,13 +2,13 @@ import dotenv from "dotenv"
 import express, { Request, Response, NextFunction } from "express"
 import cors from "cors"
 import HttpStatus from "http-status-codes"
-import { ResponseError } from "./source/error/interface"
+import { ResponseError } from "./error/interface"
 import helmet from "helmet"
-import { router as AuthenticationRouter } from "./source/Authentication"
-import { router as UserRouter } from "./source/User"
+import { router as AuthenticationRouter } from "./Authentication"
+import { router as UserRouter } from "./User"
 
 //import error handler
-import { handleError } from "./source/error/index"
+import { handleError } from "./error/index"
 
 dotenv.config()
 
