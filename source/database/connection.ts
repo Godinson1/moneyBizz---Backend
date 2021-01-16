@@ -3,7 +3,8 @@ import mongoose from "mongoose"
 mongoose.connect(`${process.env.MONGO_URL}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndex: true
+    useCreateIndex: true,
+    useFindAndModify: false
 })
 
 const connection = mongoose.connection
