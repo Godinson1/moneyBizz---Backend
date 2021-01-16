@@ -1,6 +1,6 @@
 import http from "http"
 import { app } from "./app"
-import { connection } from "./database/connection"
+import { connection } from "./source/database/connection"
 
 // setting server post
 const PORT = process.env.PORT || 5000
