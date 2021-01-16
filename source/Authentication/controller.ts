@@ -1,14 +1,13 @@
 import { Request, Response } from "express"
-import { validateReg } from "../validations"
+import { validateLogin, validateReg } from "../validations"
 import { StatusCodes } from "http-status-codes"
 import { User } from "../models/"
-import { jwtSignUser, sendWelcomeMailWithCode } from "./index"
+import { jwtSignUser, sendWelcomeMailWithCode, bizzCode } from "./index"
 import bcrypt from "bcryptjs"
 
 const { BAD_REQUEST, INTERNAL_SERVER_ERROR, CREATED } = StatusCodes
 
-const registerUser = async (req: Request, res: Response): Promise<Response> => {
-    let token: string
+const registerUser = async (req: Request, res: Response): Promise<Response | void> => {
     try {
         const { email, firstName, lastName, phone, password } = req.body
 
@@ -42,6 +41,7 @@ const registerUser = async (req: Request, res: Response): Promise<Response> => {
             email,
             address: "",
             sex: "",
+            handle: `${firstName}_${lastName}`,
             profile_photo: "",
             nameOfNextOfKin: "",
             phoneOfNextOfKin: "",
@@ -50,24 +50,23 @@ const registerUser = async (req: Request, res: Response): Promise<Response> => {
             available_balance: 0,
             connections: [],
             transactions: [],
-            active: true
+            mbCode: bizzCode(),
+            active: false
         })
 
-        await bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(newUser.password, salt, async (err, hash) => {
                 if (err) throw err
                 newUser.password = hash
+                const data = await newUser.save()
+                const token = jwtSignUser(data)
+                await sendWelcomeMailWithCode(data.mbCode, email, firstName)
+                return res.status(CREATED).json({
+                    status: "success",
+                    token,
+                    message: "Successfully registered"
+                })
             })
-        })
-
-        const data = await newUser.save()
-        token = jwtSignUser(data)
-        await sendWelcomeMailWithCode(data.id, email, firstName)
-
-        return res.status(CREATED).json({
-            status: "success",
-            token,
-            message: "Successfully registered"
         })
     } catch (error) {
         console.log(error)
@@ -78,4 +77,45 @@ const registerUser = async (req: Request, res: Response): Promise<Response> => {
     }
 }
 
-export { registerUser }
+const loginUser = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const { data, password } = req.body
+
+        const { errors, valid } = validateLogin({
+            data,
+            password
+        })
+
+        if (!valid)
+            return res.status(BAD_REQUEST).json({
+                status: "error",
+                message: errors
+            })
+
+        const userData = await User.findOne({ $or: [{ email: { $eq: data } }, { phone: { $eq: data } }] })
+
+        if (!userData)
+            return res.status(BAD_REQUEST).json({
+                status: "error",
+                message: `User with ${data} does not exist`
+            })
+
+        const isMatched = await bcrypt.compare(password, userData.password)
+        if (!isMatched) res.status(400).json({ message: "Invalid Credentials" })
+
+        const token = jwtSignUser(userData)
+        return res.status(CREATED).json({
+            status: "success",
+            token,
+            message: "Successfully Signed in"
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(INTERNAL_SERVER_ERROR).json({
+            status: "error",
+            message: "Something went wrong"
+        })
+    }
+}
+
+export { registerUser, loginUser }

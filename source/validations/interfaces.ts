@@ -5,3 +5,8 @@ export interface userData {
     password: string
     phone: string
 }
+
+export interface loginData {
+    data: string
+    password: string
+}

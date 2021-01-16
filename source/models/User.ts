@@ -16,9 +16,15 @@ const UserSchema = new Schema(
         dateOfBirth: {
             type: String
         },
+        handle: {
+            type: String
+        },
         email: {
             type: String,
             required: true
+        },
+        mbCode: {
+            type: String
         },
         address: {
             type: String

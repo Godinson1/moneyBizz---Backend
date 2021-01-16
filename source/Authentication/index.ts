@@ -1,5 +1,5 @@
 import { router } from "./routes"
-import { LoginBody, RegisterBody } from "./interface"
-import { jwtSignUser, sendWelcomeMailWithCode } from "./helper"
+import { jwtSignUser, sendWelcomeMailWithCode, bizzCode } from "./helper"
+import { auth } from "./middleware"
 
-export { router, LoginBody, RegisterBody, jwtSignUser, sendWelcomeMailWithCode }
+export { router, jwtSignUser, sendWelcomeMailWithCode, bizzCode, auth }

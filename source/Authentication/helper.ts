@@ -11,6 +11,10 @@ const jwtSignUser = (user: IUser): string => {
     })
 }
 
+const bizzCode = (): string => {
+    return `MB${Math.floor(100000 + Math.random() * 900000)}`
+}
+
 const sendWelcomeMailWithCode = (id: string, email: string, firstName: string): void => {
     const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -24,10 +28,10 @@ const sendWelcomeMailWithCode = (id: string, email: string, firstName: string): 
         from: process.env.EMAIL,
         to: email,
         subject: `Welcome to MoneyBizz `,
-        html: `<h2> Hi ${firstName}</h2> 
+        html: `<h2>&#9995; Hi ${firstName}</h2> 
                <p>Thank you for choosing to join the FORCE as a MoneyBizzer.<br>
                <br>
-               Your unique code is ${id}
+               Your unique code is <b>${id}</b>
                <br> Thank you once again!</p> 
                <br><br>
                <b>All the best!</b>
@@ -44,4 +48,4 @@ const sendWelcomeMailWithCode = (id: string, email: string, firstName: string): 
     })
 }
 
-export { jwtSignUser, sendWelcomeMailWithCode }
+export { jwtSignUser, sendWelcomeMailWithCode, bizzCode }
