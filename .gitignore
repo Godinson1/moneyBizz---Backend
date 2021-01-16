@@ -1,4 +1,2 @@
 /node_modules
-**.env
-/Utils/FBServiceAccout.json
 package-lock.json
