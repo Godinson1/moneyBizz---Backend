@@ -13,6 +13,7 @@ export interface IUser extends mongoose.Document {
     mbCode: string
     active: boolean
     profile_photo: string
+    ref: string
     password: string
     total_balance: number
     available_balance: number
@@ -34,6 +35,7 @@ export interface ITransaction extends mongoose.Document {
     recipient_accountNumber: number
     reason: string
     amount: number
+    ref: string
     executedAt: Date
     createdAt: Date
     executed: boolean

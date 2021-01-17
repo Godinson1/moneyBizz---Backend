@@ -25,11 +25,11 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
                 message: errors
             })
 
-        const alreadyExist = await User.findOne({ email })
+        const alreadyExist = await User.findOne({ $or: [{ email: { $eq: email } }, { phone: { $eq: phone } }] })
         if (alreadyExist)
             return res.status(BAD_REQUEST).json({
                 status: "error",
-                message: `User with ${email} already exist`
+                message: `User with email/phone already exist`
             })
 
         const newUser = new User({
@@ -41,6 +41,7 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
             email,
             address: "",
             sex: "",
+            ref: "",
             handle: `${firstName}_${lastName}`,
             profile_photo: "",
             nameOfNextOfKin: "",

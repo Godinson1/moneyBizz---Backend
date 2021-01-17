@@ -52,6 +52,9 @@ const UserSchema = new Schema(
         phoneOfNextOfKin: {
             type: String
         },
+        ref: {
+            type: String
+        },
         total_credit: {
             type: String
         },

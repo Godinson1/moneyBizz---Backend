@@ -35,6 +35,9 @@ const transactionSchema = new Schema(
         status: {
             type: String
         },
+        ref: {
+            type: String
+        },
         executedAt: {
             type: Number
         },

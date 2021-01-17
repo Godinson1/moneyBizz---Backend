@@ -6,6 +6,7 @@ import { ResponseError } from "./error/interface"
 import helmet from "helmet"
 import { router as AuthenticationRouter } from "./Authentication"
 import { router as UserRouter } from "./User"
+import { router as PaymentRouter } from "./Payment"
 
 //import error handler
 import { handleError } from "./error/index"
@@ -24,6 +25,7 @@ app.use(helmet())
 
 app.use("/auth", AuthenticationRouter)
 app.use("/user", UserRouter)
+app.use("/pay", PaymentRouter)
 
 // setting fall back route and message for undefined routes
 app.use((req: Request, res: Response, next: NextFunction) => {
