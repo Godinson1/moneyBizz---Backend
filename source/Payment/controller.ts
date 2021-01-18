@@ -2,7 +2,7 @@ import axios from "axios"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction } from "../models"
-import { CHARGE_URL, OTP_URL } from "./index"
+import { CHARGE_URL, OTP_URL, validateAmount } from "./index"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
 
@@ -148,8 +148,8 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         }
 
         if (chargeResponse.event === "charge.success") {
-            userData.total_balance += chargeResponse.data.amount
-            userData.available_balance += chargeResponse.data.amount
+            userData.total_balance += validateAmount(chargeResponse.data.amount)
+            userData.available_balance += validateAmount(chargeResponse.data.amount)
             await userData.save()
         }
         return res.status(OK)
