@@ -157,6 +157,7 @@ const webhook = async (req: Request, res: Response): Promise<void> => {
             //res.send(200)
         }
     } catch (error) {
+        console.log(error.response)
         res.status(INTERNAL_SERVER_ERROR).json({
             status: "error",
             message: "Something went wrong"
