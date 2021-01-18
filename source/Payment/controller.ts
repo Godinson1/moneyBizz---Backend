@@ -22,6 +22,14 @@ const fundAccount = async (req: Request, res: Response): Promise<Response> => {
 
     try {
         try {
+            userData = await User.findOne({ _id: req.user.id })
+            if (!userData) {
+                return res.status(BAD_REQUEST).json({
+                    status: "error",
+                    message: "You can't carry out this operation.."
+                })
+            }
+
             const chargeResponse = await axios.post(`${CHARGE_URL}`, data, {
                 headers: {
                     Authorization: `Bearer ${process.env.testKey}`,
@@ -30,18 +38,11 @@ const fundAccount = async (req: Request, res: Response): Promise<Response> => {
             })
 
             if (chargeResponse) {
-                userData = await User.findOne({ id: req.user.id })
-                if (!userData) {
-                    return res.status(BAD_REQUEST).json({
-                        status: "error",
-                        message: "Paystack: An error occured.."
-                    })
-                }
-
                 const newTransaction = new Transaction({
                     initiator: `${req.user.firstName} ${req.user.lastName}`,
                     initiator_phone: req.user.phone,
                     initiator_bankCode: code,
+                    initiator_bank: "",
                     initiator_accountNumber: account_number,
                     recipient: "self",
                     recipient_bank: "self",
@@ -80,13 +81,14 @@ const fundAccount = async (req: Request, res: Response): Promise<Response> => {
 }
 
 const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
+    let transactionData
     const { otp } = req.body
     try {
         try {
-            const userData = await User.findOne({ id: req.user.id })
+            const userData = await User.findOne({ _id: req.user.id })
             const data = JSON.stringify({
                 otp,
-                reference: userData?.ref //"yj20z1xppjdshun"
+                reference: userData.ref
             })
             const otpResponse = await axios.post(`${OTP_URL}`, data, {
                 headers: {
@@ -95,7 +97,12 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
                 }
             })
             console.log(otpResponse.data)
-            //update transaction - Todo
+            transactionData = await Transaction.findOne({ ref: userData.ref })
+            transactionData.status = otpResponse.data.data.gateway_response
+            transactionData.executedAt = otpResponse.data.data.transaction_date
+            transactionData.initiator_bank = otpResponse.data.data.authorization.bank
+            transactionData.executed = true
+            await transactionData.save()
             return res.status(OK).json({
                 status: "success",
                 message: "Payment attempted successfully",
@@ -121,6 +128,10 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
 //before updating user's account
 const webhook = (req: Request, res: Response): void => {
     try {
+        const event = req.body
+        console.log(event)
+        res.send(200)
+
         res.status(OK).json({
             status: "success",
             message: "Good feedback"

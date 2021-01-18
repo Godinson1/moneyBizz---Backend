@@ -56,6 +56,12 @@ const activateUser = async (req: Request, res: Response): Promise<Response> => {
                 message: "Invalid Code, Please check code and try again"
             })
 
+        if (userData.active === true)
+            return res.status(BAD_REQUEST).json({
+                status: "error",
+                message: "Account already activated"
+            })
+
         if (req.user.id === userData.id) {
             userData.active = true
             await userData.save()

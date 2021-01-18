@@ -5,7 +5,7 @@ import { auth } from "../Authentication"
 const router = express.Router()
 
 router.get("/", getAllUser)
-router.delete("/", auth, deleteAllUser)
+router.delete("/", deleteAllUser)
 router.post("/activate", auth, activateUser)
 
 export { router }

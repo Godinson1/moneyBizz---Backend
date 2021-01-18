@@ -14,20 +14,23 @@ const transactionSchema = new Schema(
         initiator_bank: {
             type: String
         },
+        initiator_bankCode: {
+            type: String
+        },
         initiator_accountNumber: {
-            type: Number
+            type: String
         },
         recipient_bank: {
             type: String
         },
         recipient_accountNumber: {
-            type: Number
+            type: String
         },
         recipient: {
             type: String
         },
         amount: {
-            type: Number
+            type: String
         },
         reason: {
             type: String
@@ -39,7 +42,7 @@ const transactionSchema = new Schema(
             type: String
         },
         executedAt: {
-            type: Number
+            type: Date
         },
         executed: {
             type: Boolean

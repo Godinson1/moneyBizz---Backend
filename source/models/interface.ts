@@ -29,12 +29,13 @@ export interface ITransaction extends mongoose.Document {
     initiator: string
     initiator_phone: string
     initiator_bank: string
-    initiator_accountNumber: number
+    initiator_bankCode: string
+    initiator_accountNumber: string
     recipient: string
     recipient_bank: string
-    recipient_accountNumber: number
+    recipient_accountNumber: string
     reason: string
-    amount: number
+    amount: string
     ref: string
     executedAt: Date
     createdAt: Date
