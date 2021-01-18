@@ -126,16 +126,17 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
 
 //Todo - To connfirm payment with either charge.success or charge.failure
 //before updating user's account
-const webhook = (req: Request, res: Response): void => {
+const webhook = async (req: Request, res: Response): Promise<void> => {
+    let userData
     try {
-        const event = req.body
-        console.log(event)
-        res.send(200)
-
-        res.status(OK).json({
-            status: "success",
-            message: "Good feedback"
-        })
+        const chargeResponse = req.body
+        console.log(chargeResponse)
+        userData = await User.findOne({ _id: req.user.id })
+        if (chargeResponse.event === "charge.success") {
+            userData.total_balance += chargeResponse.data.amount
+            await userData.save()
+            res.send(200)
+        }
     } catch (error) {
         res.status(INTERNAL_SERVER_ERROR).json({
             status: "error",
