@@ -141,14 +141,14 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
 //before updating user's account
 const webhook = async (req: Request, res: Response): Promise<Response> => {
     let userData
-    res.send(200)
+
     try {
         const chargeResponse = req.body
         console.log(chargeResponse.data.amount)
         console.log(chargeResponse.event)
 
-        userData = await User.findOne({ _id: req.user.id })
-        console.log("users data", userData)
+        userData = await User.findOne({ email: req.user.email })
+        console.log(userData)
 
         if (chargeResponse.event === "charge.success") {
             userData.total_balance += chargeResponse.data.amount
