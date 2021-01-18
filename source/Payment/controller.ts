@@ -137,8 +137,6 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
     }
 }
 
-//Todo - To connfirm payment with either charge.success or charge.failure
-//before updating user's account
 const webhook = async (req: Request, res: Response): Promise<Response> => {
     let userData
     const chargeResponse = req.body
@@ -151,6 +149,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
 
         if (chargeResponse.event === "charge.success") {
             userData.total_balance += chargeResponse.data.amount
+            userData.available_balance += chargeResponse.data.amount
             await userData.save()
         }
         return res.status(OK)
