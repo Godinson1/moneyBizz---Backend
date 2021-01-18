@@ -145,7 +145,7 @@ const webhook = async (req: Request, res: Response): Promise<void> => {
         const chargeResponse = req.body
 
         userData = await User.findOne({ _id: req.user.id })
-        console.log(userData)
+        console.log("users data", userData)
         console.log(chargeResponse.data.amount)
         console.log(chargeResponse.event)
 
@@ -157,7 +157,7 @@ const webhook = async (req: Request, res: Response): Promise<void> => {
             //res.send(200)
         }
     } catch (error) {
-        console.log(error.response)
+        console.log("Consoling error", error.response)
         res.status(INTERNAL_SERVER_ERROR).json({
             status: "error",
             message: "Something went wrong"
