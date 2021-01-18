@@ -141,14 +141,13 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
 //before updating user's account
 const webhook = async (req: Request, res: Response): Promise<Response> => {
     let userData
+    const chargeResponse = req.body
 
     try {
-        const chargeResponse = req.body
-        console.log(chargeResponse.data.amount)
-        console.log(chargeResponse.event)
-
-        userData = await User.findOne({ email: req.user.email })
-        console.log(userData)
+        userData = await User.findOne({ ref: chargeResponse.data.reference })
+        if (!userData) {
+            console.log("Not found")
+        }
 
         if (chargeResponse.event === "charge.success") {
             userData.total_balance += chargeResponse.data.amount
@@ -159,8 +158,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         console.log("Consoling error", error)
         return res.status(INTERNAL_SERVER_ERROR).json({
             status: "error",
-            message: "Something went wrong",
-            error
+            message: "Something went wrong"
         })
     }
 }
