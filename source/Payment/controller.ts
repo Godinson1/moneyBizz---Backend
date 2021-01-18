@@ -96,23 +96,36 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
                     "Content-Type": "application/json"
                 }
             })
-            console.log(otpResponse.data)
-            transactionData = await Transaction.findOne({ ref: userData.ref })
-            transactionData.status = otpResponse.data.data.gateway_response
-            transactionData.executedAt = otpResponse.data.data.transaction_date
-            transactionData.initiator_bank = otpResponse.data.data.authorization.bank
-            transactionData.executed = true
-            await transactionData.save()
-            return res.status(OK).json({
-                status: "success",
-                message: "Payment attempted successfully",
-                data: otpResponse.data
-            })
+
+            if (otpResponse) {
+                const otpRes = await axios.post(`${OTP_URL}`, data, {
+                    headers: {
+                        Authorization: `Bearer ${process.env.testKey}`,
+                        "Content-Type": "application/json"
+                    }
+                })
+                transactionData = await Transaction.findOne({ ref: userData.ref })
+                transactionData.status = otpRes.data.data.gateway_response
+                transactionData.executedAt = otpRes.data.data.transaction_date
+                transactionData.initiator_bank = otpRes.data.data.authorization.bank
+                transactionData.executed = true
+                const trans = await transactionData.save()
+                return res.status(OK).json({
+                    status: "success",
+                    message: "Payment attempted successfully",
+                    data: trans
+                })
+            } else {
+                return res.status(INTERNAL_SERVER_ERROR).json({
+                    status: "error",
+                    message: "Something went wrong"
+                })
+            }
         } catch (error) {
             console.log(error)
             return res.status(BAD_REQUEST).json({
                 status: "error",
-                message: error.response.data
+                message: error.response?.data
             })
         }
     } catch (error) {
