@@ -143,17 +143,19 @@ const webhook = async (req: Request, res: Response): Promise<void> => {
     let userData
     try {
         const chargeResponse = req.body
+
+        userData = await User.findOne({ _id: req.user.id })
+        console.log(userData)
         console.log(chargeResponse.data.amount)
         console.log(chargeResponse.event)
-        userData = await User.findOne({ _id: req.user.id })
-        console.log(userData.total_balance)
-        console.log(chargeResponse.event === "charge.success" ? true : false)
+
+        console.log("working", chargeResponse.event === "charge.success" ? true : false)
         res.send(200)
-        /*if (chargeResponse.event === "charge.success") {
-        //userData.total_balance += chargeResponse.data.amount
-        //await userData.save()
-        //res.send(200)
-        //}*/
+        if (chargeResponse.event === "charge.success") {
+            //userData.total_balance += chargeResponse.data.amount
+            //await userData.save()
+            //res.send(200)
+        }
     } catch (error) {
         res.status(INTERNAL_SERVER_ERROR).json({
             status: "error",
