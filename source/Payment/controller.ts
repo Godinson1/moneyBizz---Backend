@@ -2,8 +2,7 @@ import axios from "axios"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction } from "../models"
-import { CHARGE_URL, OTP_URL, validateAmount, validateIP } from "./index"
-import crypto from "crypto"
+import { CHARGE_URL, OTP_URL, validateAmount } from "./index"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
 
