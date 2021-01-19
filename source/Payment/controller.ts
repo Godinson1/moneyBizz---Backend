@@ -2,7 +2,7 @@ import axios from "axios"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction } from "../models"
-import { CHARGE_URL, OTP_URL, validateAmount } from "./index"
+import { CHARGE_URL, OTP_URL, validateAmount, validateIP } from "./index"
 import crypto from "crypto"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
@@ -142,25 +142,22 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
     let userData
 
     try {
-        const hash = crypto
-            .createHmac("sha512", `${process.env.SECRET_KEY}`)
-            .update(JSON.stringify(req.body))
-            .digest("hex")
-        if (hash == req.headers["x-paystack-signature"]) {
-            const chargeResponse = req.body
-            userData = await User.findOne({ ref: chargeResponse.data.reference })
-            if (userData) {
-                console.log("Found")
-            }
-
-            console.log(validateAmount(chargeResponse.data.amount))
-
-            if (chargeResponse.event === "charge.success") {
-                userData.total_balance += chargeResponse.data.amount
-                userData.available_balance += chargeResponse.data.amount
-                await userData.save()
-            }
+        //const hash = validateIP(req.body)
+        //if (hash == req.headers["x-paystack-signature"]) {
+        const chargeResponse = req.body
+        userData = await User.findOne({ ref: chargeResponse.data.reference })
+        if (userData) {
+            console.log("Found")
         }
+
+        console.log(validateAmount(chargeResponse.data.amount))
+
+        if (chargeResponse.event === "charge.success") {
+            userData.total_balance += chargeResponse.data.amount
+            userData.available_balance += chargeResponse.data.amount
+            await userData.save()
+        }
+        //}
         return res.status(OK)
     } catch (error) {
         console.log("Consoling error", error)
