@@ -149,15 +149,15 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         if (hash == req.headers["x-paystack-signature"]) {
             const chargeResponse = req.body
             userData = await User.findOne({ ref: chargeResponse.data.reference })
-            if (!userData) {
-                console.log("Not found")
+            if (userData) {
+                console.log("Found")
             }
 
-            const amount = validateAmount(chargeResponse.data.amount)
+            console.log(validateAmount(chargeResponse.data.amount))
 
             if (chargeResponse.event === "charge.success") {
-                userData.total_balance += amount
-                userData.available_balance += amount
+                userData.total_balance += chargeResponse.data.amount
+                userData.available_balance += chargeResponse.data.amount
                 await userData.save()
             }
         }
