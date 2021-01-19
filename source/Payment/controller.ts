@@ -3,6 +3,7 @@ import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction } from "../models"
 import { CHARGE_URL, OTP_URL, validateAmount } from "./index"
+import crypto from "crypto"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
 
@@ -139,18 +140,26 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
 
 const webhook = async (req: Request, res: Response): Promise<Response> => {
     let userData
-    const chargeResponse = req.body
 
     try {
-        userData = await User.findOne({ ref: chargeResponse.data.reference })
-        if (!userData) {
-            console.log("Not found")
-        }
+        const hash = crypto
+            .createHmac("sha512", `${process.env.SECRET_KEY}`)
+            .update(JSON.stringify(req.body))
+            .digest("hex")
+        if (hash == req.headers["x-paystack-signature"]) {
+            const chargeResponse = req.body
+            userData = await User.findOne({ ref: chargeResponse.data.reference })
+            if (!userData) {
+                console.log("Not found")
+            }
 
-        if (chargeResponse.event === "charge.success") {
-            userData.total_balance += validateAmount(chargeResponse.data.amount)
-            userData.available_balance += validateAmount(chargeResponse.data.amount)
-            await userData.save()
+            const amount = validateAmount(chargeResponse.data.amount)
+
+            if (chargeResponse.event === "charge.success") {
+                userData.total_balance += amount
+                userData.available_balance += amount
+                await userData.save()
+            }
         }
         return res.status(OK)
     } catch (error) {
