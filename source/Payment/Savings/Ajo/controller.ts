@@ -78,14 +78,14 @@ const activateAjo = async (req: Request, res: Response): Promise<Response> => {
                 message: "Please fill out required fields"
             })
 
-        ajoData = Ajo.findOne({ ajo_code })
+        ajoData = await Ajo.findOne({ ajo_code })
         if (!ajoData)
             return res.status(NOT_FOUND).json({
                 status: "error",
                 message: "Ajo account not found"
             })
 
-        ajoData.members.map(async (member: IAjoMember) => {
+        ajoData.members.find(async (member: IAjoMember) => {
             if (member.phone === req.user.phone) {
                 member.active = true
             }
@@ -106,4 +106,27 @@ const activateAjo = async (req: Request, res: Response): Promise<Response> => {
     }
 }
 
-export { ajo, activateAjo }
+const retrieveAjo = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const ajoData = await Ajo.findOne({ ajo_code: req.params.id })
+        if (!ajoData)
+            return res.status(NOT_FOUND).json({
+                status: "error",
+                message: "Ajo account not found"
+            })
+
+        return res.status(OK).json({
+            status: "success",
+            message: "Successfully Retrieved Ajo",
+            data: ajoData
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(INTERNAL_SERVER_ERROR).json({
+            status: "error",
+            message: "Something went wrong"
+        })
+    }
+}
+
+export { ajo, activateAjo, retrieveAjo }
