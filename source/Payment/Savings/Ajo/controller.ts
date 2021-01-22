@@ -85,7 +85,7 @@ const activateAjo = async (req: Request, res: Response): Promise<Response> => {
                 message: "Ajo account not found"
             })
 
-        ajoData.members.find(async (member: IAjoMember) => {
+        ajoData.members.forEach(async (member: IAjoMember) => {
             if (member.phone === req.user.phone) {
                 member.active = true
             }
@@ -95,7 +95,8 @@ const activateAjo = async (req: Request, res: Response): Promise<Response> => {
 
         return res.status(OK).json({
             status: "success",
-            message: "Successfully Activated Ajo"
+            message: "Successfully Activated Ajo",
+            data: ajoData
         })
     } catch (error) {
         console.log(error)
