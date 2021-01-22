@@ -23,7 +23,7 @@ export interface IUser extends mongoose.Document {
     nameOfNextOfKin: string
     phoneOfNextOfKin: string
     connections: Array<IConnection>
-    total_debits: number
+    total_debit: number
     total_credit: number
     transactions: Array<ITransaction>
 }

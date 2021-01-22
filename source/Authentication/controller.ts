@@ -48,6 +48,7 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
             phoneOfNextOfKin: "",
             total_balance: 0,
             total_credit: 0,
+            total_debit: 0,
             available_balance: 0,
             connections: [],
             transactions: [],

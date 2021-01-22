@@ -64,7 +64,7 @@ const UserSchema = new Schema(
         available_balance: {
             type: Number
         },
-        total_debits: {
+        total_debit: {
             type: Number
         },
         transactions: {

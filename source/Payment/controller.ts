@@ -84,7 +84,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
 
         if (chargeResponse.event === "charge.success") {
             userData.total_credit += parseInt(chargeResponse.data.amount)
-            const balance = userData.total_credit - userData.total_debits
+            const balance = userData.total_credit - userData.total_debit
             userData.total_balance += balance
             userData.available_balance += balance
             await userData.save()
