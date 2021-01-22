@@ -50,8 +50,6 @@ const ajo = async (req: Request, res: Response): Promise<Response> => {
             message: `You created AJo account!! Your Ajo Code is - ${ajoData.ajo_code}.`
         })
         await notify.save()
-        //Notify members and initiator about joining ajo
-        //User needs to confirm before getting added to the ajo list
         return res.status(OK).json({
             status: "success",
             message: "Successfully Retrieved Ajo Members",

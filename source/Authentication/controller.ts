@@ -47,7 +47,7 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
             nameOfNextOfKin: "",
             phoneOfNextOfKin: "",
             total_balance: 0,
-            total_debits: "",
+            total_credit: 0,
             available_balance: 0,
             connections: [],
             transactions: [],
