@@ -56,7 +56,7 @@ const UserSchema = new Schema(
             type: String
         },
         total_credit: {
-            type: String
+            type: Number
         },
         total_balance: {
             type: Number

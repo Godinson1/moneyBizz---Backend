@@ -5,7 +5,7 @@ const validateAmount = (data: string): string => {
     return result
 }
 
-const validateIP = (data: any): string => {
+const validateIP = (data: string): string => {
     const hash = crypto.createHmac("sha512", `${process.env.SECRET_KEY}`).update(JSON.stringify(data)).digest("hex")
     return hash
 }

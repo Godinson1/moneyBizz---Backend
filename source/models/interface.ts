@@ -12,6 +12,9 @@ export interface IUser extends mongoose.Document {
     sex: string
     mbCode: string
     active: boolean
+    bank: string
+    bankCode: string
+    accountNumber: string
     profile_photo: string
     ref: string
     password: string
@@ -21,6 +24,7 @@ export interface IUser extends mongoose.Document {
     phoneOfNextOfKin: string
     connections: Array<IConnection>
     total_debits: number
+    total_credit: number
     transactions: Array<ITransaction>
 }
 
@@ -51,4 +55,43 @@ export interface IConnection extends mongoose.Document {
     connectee_bank: string
     connectee_profilePhoto: string
     connecteeName: string
+}
+
+export interface IAjo extends mongoose.Document {
+    ajoID: mongoose.Types.ObjectId
+    initiator: string
+    initiator_phone: string
+    initiator_bank: string
+    initiator_bankCode: string
+    initiator_accountNumber: string
+    reason: string
+    target_amount: string
+    total_balance: string
+    total_credit: string
+    total_debit: string
+    ajo_code: string
+    terminatedAt: Date
+    members: Array<IAjoMember>
+    status: string
+}
+
+export interface IAjoMember {
+    name: string
+    phone: string
+    bank: string
+    bankCode: string
+    accountNumber: string
+    total_debit: number
+    total_credit: number
+    ajo_code: string
+    active: boolean
+}
+
+export interface INotification extends mongoose.Document {
+    notificationID: mongoose.Types.ObjectId
+    senderId: string
+    receiverId: string
+    read: boolean
+    message: string
+    type: string
 }
