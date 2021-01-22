@@ -78,7 +78,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         } else {
             console.log(false)
         }
-        //console.log(validateAmount(chargeResponse.data.amount))
+
         const chargeResponse = req.body
         userData = await User.findOne({ ref: chargeResponse.data.reference })
 

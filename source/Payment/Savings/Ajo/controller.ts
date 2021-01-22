@@ -1,10 +1,10 @@
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
-import { User, Ajo, Notification } from "../../../models"
+import { User, Ajo, Notification, IAjoMember } from "../../../models"
 import { isEmpty } from "../../../validations"
 import { addMember, ajoCode } from "../index"
 
-const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
+const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND } = StatusCodes
 
 /**
  * Route for collective saving (Collective Saving - AJO)
@@ -52,7 +52,7 @@ const ajo = async (req: Request, res: Response): Promise<Response> => {
         await notify.save()
         return res.status(OK).json({
             status: "success",
-            message: "Successfully Retrieved Ajo Members",
+            message: "Successfully Created Ajo",
             data: {
                 reason,
                 members: membersData,
@@ -68,4 +68,42 @@ const ajo = async (req: Request, res: Response): Promise<Response> => {
     }
 }
 
-export { ajo }
+const activateAjo = async (req: Request, res: Response): Promise<Response> => {
+    let ajoData
+    try {
+        const { ajo_code } = req.body
+        if (isEmpty(ajo_code))
+            return res.status(BAD_REQUEST).json({
+                status: "error",
+                message: "Please fill out required fields"
+            })
+
+        ajoData = Ajo.findOne({ ajo_code })
+        if (!ajoData)
+            return res.status(NOT_FOUND).json({
+                status: "error",
+                message: "Ajo account not found"
+            })
+
+        ajoData.members.map(async (member: IAjoMember) => {
+            if (member.phone === req.user.phone) {
+                member.active = true
+            }
+        })
+
+        await ajoData.save()
+
+        return res.status(OK).json({
+            status: "success",
+            message: "Successfully Activated Ajo"
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(INTERNAL_SERVER_ERROR).json({
+            status: "error",
+            message: "Something went wrong"
+        })
+    }
+}
+
+export { ajo, activateAjo }
