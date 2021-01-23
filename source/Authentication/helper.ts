@@ -4,8 +4,8 @@ import nodemailer from "nodemailer"
 
 const jwtSignUser = (user: IUser): string => {
     const ONE_WEEK = 60 * 60 * 24 * 7
-    const { id, firstName, email, password, lastName, phone } = user
-    const userData = { id, firstName, email, password, lastName, phone }
+    const { id, firstName, email, handle, lastName, phone } = user
+    const userData = { id, firstName, email, handle, lastName, phone }
     return jwt.sign(userData, `${process.env.jwt_secret}`, {
         expiresIn: ONE_WEEK
     })

@@ -59,11 +59,7 @@ export interface IConnection extends mongoose.Document {
 
 export interface IAjo extends mongoose.Document {
     ajoID: mongoose.Types.ObjectId
-    initiator: string
-    initiator_phone: string
-    initiator_bank: string
-    initiator_bankCode: string
-    initiator_accountNumber: string
+    createdBy: string
     reason: string
     target_amount: string
     total_balance: string
@@ -78,9 +74,10 @@ export interface IAjo extends mongoose.Document {
 export interface IAjoMember {
     name: string
     phone: string
-    bank: string
-    bankCode: string
-    accountNumber: string
+    handle: string
+    bank: string | null
+    bankCode: string | null
+    accountNumber: string | null
     total_debit: number
     total_credit: number
     ajo_code: string
@@ -89,8 +86,8 @@ export interface IAjoMember {
 
 export interface INotification extends mongoose.Document {
     notificationID: mongoose.Types.ObjectId
-    senderId: string
-    receiverId: string
+    sender: string
+    receiver: string
     read: boolean
     message: string
     type: string

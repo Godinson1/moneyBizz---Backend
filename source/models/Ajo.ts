@@ -5,19 +5,7 @@ const Schema = mongoose.Schema
 
 const ajoSchema = new Schema(
     {
-        initiator: {
-            type: String
-        },
-        initiator_phone: {
-            type: String
-        },
-        initiator_bank: {
-            type: String
-        },
-        initiator_bankCode: {
-            type: String
-        },
-        initiator_accountNumber: {
+        createdBy: {
             type: String
         },
         target_amount: {

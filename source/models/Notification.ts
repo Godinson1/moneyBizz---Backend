@@ -5,10 +5,10 @@ const Schema = mongoose.Schema
 
 const notificationSchema = new Schema(
     {
-        senderId: {
+        sender: {
             type: String
         },
-        receiverId: {
+        receiver: {
             type: String
         },
         message: {
@@ -18,6 +18,9 @@ const notificationSchema = new Schema(
             type: Boolean
         },
         type: {
+            type: String
+        },
+        typeId: {
             type: String
         }
     },

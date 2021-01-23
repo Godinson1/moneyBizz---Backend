@@ -1,10 +1,10 @@
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
-import { User, Ajo, Notification, IAjoMember } from "../../../models"
+import { Ajo, IAjoMember } from "../../../models"
 import { isEmpty } from "../../../validations"
-import { addMember, ajoCode } from "../index"
+import { addMember, ajoCode, notifyMembers, addNewMember } from "../index"
 
-const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND } = StatusCodes
+const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED } = StatusCodes
 
 /**
  * Route for collective saving (Collective Saving - AJO)
@@ -20,14 +20,10 @@ const ajo = async (req: Request, res: Response): Promise<Response> => {
                 message: "Please fill out required fields"
             })
 
-        const membersData = await addMember(User, members, req.user.id, req.user.firstName)
+        const membersData = await addMember(members)
 
         const newAjo = new Ajo({
-            initiator: `${req.user.firstName} ${req.user.lastName}`,
-            initiator_phone: req.user.phone,
-            initiator_bankCode: "",
-            initiator_bank: "",
-            initiator_accountNumber: "",
+            createdBy: `${req.user.handle}`,
             reason,
             target_amount,
             total_balance: 0,
@@ -41,21 +37,16 @@ const ajo = async (req: Request, res: Response): Promise<Response> => {
 
         const ajoData = await newAjo.save()
 
-        //Notify creator
-        const notify = new Notification({
-            senderId: req.user.id,
-            receiverId: req.user.id,
-            read: false,
-            type: "Ajo",
-            message: `You created AJo account!! Your Ajo Code is - ${ajoData.ajo_code}.`
-        })
-        await notify.save()
+        await notifyMembers(members, ajoData._id, req.user.firstName, req.user.handle, ajoData.ajo_code)
+
         return res.status(OK).json({
             status: "success",
             message: "Successfully Created Ajo",
             data: {
-                reason,
-                members: membersData,
+                createdBy: ajoData.createdBy,
+                ajoCode: ajoData.ajo_code,
+                reason: ajoData.reason,
+                members: ajoData.members,
                 terminatedAt
             }
         })
@@ -85,18 +76,29 @@ const activateAjo = async (req: Request, res: Response): Promise<Response> => {
                 message: "Ajo account not found"
             })
 
-        ajoData.members.forEach(async (member: IAjoMember) => {
-            if (member.phone === req.user.phone) {
-                member.active = true
-            }
-        })
+        const ajoIndex = ajoData.members.findIndex((member: IAjoMember) => member.phone === req.user.phone)
+        if (ajoIndex === -1) {
+            return res.status(NOT_FOUND).json({
+                status: "error",
+                message: "You are not a member of this Ajo account"
+            })
+        }
 
-        await ajoData.save()
+        if (ajoData.members[ajoIndex].active === true) {
+            return res.status(BAD_REQUEST).json({
+                status: "error",
+                message: "You are already an active member of this Ajo account"
+            })
+        }
+
+        await Ajo.updateOne(
+            { ajo_code: ajoData.ajo_code, "members.handle": req.user.handle },
+            { $set: { "members.$.active": true } }
+        )
 
         return res.status(OK).json({
             status: "success",
-            message: "Successfully Activated Ajo",
-            data: ajoData
+            message: "Successfully Activated Ajo"
         })
     } catch (error) {
         console.log(error)
@@ -110,6 +112,8 @@ const activateAjo = async (req: Request, res: Response): Promise<Response> => {
 const retrieveAjo = async (req: Request, res: Response): Promise<Response> => {
     try {
         const ajoData = await Ajo.findOne({ ajo_code: req.params.id })
+        console.log(req.params.id)
+        console.log(ajoData)
         if (!ajoData)
             return res.status(NOT_FOUND).json({
                 status: "error",
@@ -130,4 +134,58 @@ const retrieveAjo = async (req: Request, res: Response): Promise<Response> => {
     }
 }
 
-export { ajo, activateAjo, retrieveAjo }
+const addAjoMember = async (req: Request, res: Response): Promise<Response> => {
+    const { members } = req.body
+    try {
+        const ajoData = await Ajo.findOne({ ajo_code: req.params.id })
+        if (!ajoData)
+            return res.status(NOT_FOUND).json({
+                status: "error",
+                message: "Ajo account not found"
+            })
+
+        if (members.length === 0) {
+            return res.status(BAD_REQUEST).json({
+                status: "error",
+                message: "You need to add atleast one member"
+            })
+        }
+
+        //Update ajo interface and model and add hostId to perform check
+        //instead of using full name of host..
+        if (ajoData.createdBy !== `${req.user.handle}`) {
+            return res.status(UNAUTHORIZED).json({
+                status: "error",
+                message: "You are not authorised to perform this action"
+            })
+        }
+
+        const data = await addNewMember(members, ajoData.ajo_code, req.user.handle, req.user.firstName)
+        if (typeof data === "string") {
+            return res.status(BAD_REQUEST).json({
+                status: "error",
+                message: data
+            })
+        }
+
+        data.forEach((ajoMember) => {
+            ajoData.members.push(ajoMember)
+        })
+
+        const newAjoData = await ajoData.save()
+
+        return res.status(OK).json({
+            status: "success",
+            message: "Successfully Added Ajo Member(s)",
+            data: newAjoData
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(INTERNAL_SERVER_ERROR).json({
+            status: "error",
+            message: "Something went wrong"
+        })
+    }
+}
+
+export { ajo, activateAjo, retrieveAjo, addAjoMember }
