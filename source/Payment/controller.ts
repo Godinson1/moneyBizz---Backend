@@ -2,7 +2,7 @@ import axios from "axios"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction } from "../models"
-import { OTP_URL, BALANCE, validateIP } from "./index"
+import { OTP_URL, BALANCE, validateIP, makeRequest } from "./index"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
 
@@ -16,20 +16,10 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
                 otp,
                 reference: userData.ref
             })
-            const otpResponse = await axios.post(`${OTP_URL}`, data, {
-                headers: {
-                    Authorization: `Bearer ${process.env.testKey}`,
-                    "Content-Type": "application/json"
-                }
-            })
+            const otpResponse = await makeRequest(OTP_URL, data)
 
             if (otpResponse) {
-                const otpRes = await axios.post(`${OTP_URL}`, data, {
-                    headers: {
-                        Authorization: `Bearer ${process.env.testKey}`,
-                        "Content-Type": "application/json"
-                    }
-                })
+                const otpRes = await makeRequest(OTP_URL, data)
                 transactionData = await Transaction.findOne({ ref: userData.ref })
                 transactionData.status = otpRes.data.data.gateway_response
                 transactionData.executedAt = otpRes.data.data.transaction_date

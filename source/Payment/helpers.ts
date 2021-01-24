@@ -1,4 +1,6 @@
 import crypto from "crypto"
+import axios from "axios"
+import { otpData, chargeData } from "./index"
 
 const validateAmount = (data: string): string => {
     const result = data.slice(0, -2)
@@ -10,4 +12,14 @@ const validateIP = (data: string): string => {
     return hash
 }
 
-export { validateAmount, validateIP }
+const makeRequest = async (url: string, data: string): Promise<any> => {
+    const chargeResponse = await axios.post(url, data, {
+        headers: {
+            Authorization: `Bearer ${process.env.testKey}`,
+            "Content-Type": "application/json"
+        }
+    })
+    return chargeResponse
+}
+
+export { validateAmount, validateIP, makeRequest }

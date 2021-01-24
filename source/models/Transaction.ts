@@ -38,6 +38,12 @@ const transactionSchema = new Schema(
         status: {
             type: String
         },
+        deviceIp: {
+            type: String
+        },
+        deviceType: {
+            type: String
+        },
         ref: {
             type: String
         },

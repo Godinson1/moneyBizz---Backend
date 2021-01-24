@@ -1,8 +1,8 @@
-import axios from "axios"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction } from "../../../models"
-import { CHARGE_URL } from "../../index"
+import { CHARGE_URL, makeRequest } from "../../index"
+import { getUserIp } from "../../../Utility"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
 
@@ -35,12 +35,7 @@ const fundAccount = async (req: Request, res: Response): Promise<Response> => {
                 })
             }
 
-            const chargeResponse = await axios.post(`${CHARGE_URL}`, data, {
-                headers: {
-                    Authorization: `Bearer ${process.env.testKey}`,
-                    "Content-Type": "application/json"
-                }
-            })
+            const chargeResponse = await makeRequest(CHARGE_URL, data)
 
             if (chargeResponse) {
                 const newTransaction = new Transaction({
@@ -55,6 +50,8 @@ const fundAccount = async (req: Request, res: Response): Promise<Response> => {
                     reason: "Top up wallet",
                     amount,
                     ref: chargeResponse.data.data.reference,
+                    deviceIp: getUserIp(req),
+                    deviceType: req.device.client.name,
                     executedAt: Date.now(),
                     createdAt: Date.now(),
                     executed: false,

@@ -38,18 +38,7 @@ const notifyMembers = async (
     for (let i = 0; i < array.length; i++) {
         const userData = await findUserByHandle(User, array[i].handle)
         if (userData) {
-            const notify = new Notification({
-                sender: userHandle,
-                receiver: userData.handle,
-                read: false,
-                type: "Ajo",
-                typeId: ajoId,
-                message:
-                    userHandle === userData.handle
-                        ? `You created AJo account!! Your Ajo Code is - ${ajoCode}.`
-                        : `${userFirstName} created Ajo account and added you.`
-            })
-            await notify.save()
+            await createNotification(userHandle, userData.handle, userFirstName, ajoId, ajoCode)
         }
     }
     return true
@@ -88,21 +77,34 @@ const addNewMember = async (
                     ajo_code: "",
                     active: false
                 })
-                const notify = new Notification({
-                    sender: userHandle,
-                    receiver: userData.handle,
-                    read: false,
-                    type: "Ajo",
-                    typeId: ajoData._id,
-                    message: `${userFirstName} created Ajo account and added you.`
-                })
-                await notify.save()
+                await createNotification(userHandle, userData.handle, userFirstName, ajoData.id, ajo_code)
             }
         } else {
             return `User with ${array[i].handle} does not exist`
         }
     }
     return addedMembers
+}
+
+const createNotification = async (
+    sender: string,
+    receiver: string,
+    senderFirstName: string,
+    ajoID: string,
+    ajoCode: string
+): Promise<void> => {
+    const notify = new Notification({
+        sender,
+        receiver,
+        read: false,
+        type: "Ajo",
+        typeId: ajoID,
+        message:
+            sender === receiver
+                ? `You created AJo account!! Your Ajo Code is - ${ajoCode}.`
+                : `${senderFirstName} created Ajo account and added you.`
+    })
+    await notify.save()
 }
 
 export { addMember, ajoCode, notifyMembers, findUserByHandle, addNewMember }

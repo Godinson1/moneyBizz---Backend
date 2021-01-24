@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { Ajo, IAjoMember } from "../../../models"
+import { hasBotResult } from "../../../Utility"
 import { isEmpty } from "../../../validations"
 import { addMember, ajoCode, notifyMembers, addNewMember } from "../index"
 
@@ -123,7 +124,13 @@ const retrieveAjo = async (req: Request, res: Response): Promise<Response> => {
         return res.status(OK).json({
             status: "success",
             message: "Successfully Retrieved Ajo",
-            data: ajoData
+            data: ajoData,
+            devicdeInfo: {
+                device: req.device,
+                userAgent: req.useragent,
+                bot: hasBotResult(req.bot),
+                botMain: req.bot
+            }
         })
     } catch (error) {
         console.log(error)

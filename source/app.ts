@@ -4,6 +4,9 @@ import cors from "cors"
 import HttpStatus from "http-status-codes"
 import { ResponseError } from "./error/interface"
 import helmet from "helmet"
+import { middlewareDetect } from "./Utility"
+
+//Routes
 import { router as AuthenticationRouter } from "./Authentication"
 import { router as UserRouter } from "./User"
 import { router as PaymentRouter } from "./Payment"
@@ -22,6 +25,9 @@ app.use(cors())
 
 //Configure Helmet
 app.use(helmet())
+
+//Device Configurations
+app.use(middlewareDetect)
 
 app.use("/auth", AuthenticationRouter)
 app.use("/user", UserRouter)

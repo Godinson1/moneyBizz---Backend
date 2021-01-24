@@ -38,6 +38,8 @@ export interface ITransaction extends mongoose.Document {
     recipient: string
     recipient_bank: string
     recipient_accountNumber: string
+    deviceIp: string
+    deviceType: string
     reason: string
     amount: string
     ref: string
