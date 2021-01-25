@@ -1,9 +1,9 @@
 import crypto from "crypto"
 import axios, { AxiosResponse } from "axios"
 
-const validateAmount = (data: string): string => {
+const validateAmount = (data: string): number => {
     const result = data.slice(0, -2)
-    return result
+    return parseInt(result)
 }
 
 const validateIP = (data: string): string => {
