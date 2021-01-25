@@ -1,11 +1,10 @@
 import { IUser, IAjoMember, Notification, User, Ajo } from "../../../models"
-import mongoose from "mongoose"
 import { Result } from "./interface"
 
 const addMember = async (array: Array<{ handle: string }>): Promise<Array<IAjoMember>> => {
     const addedMembers = []
     for (let i = 0; i < array.length; i++) {
-        const userData = await findUserByHandle(User, array[i].handle)
+        const userData = await findUserByHandle(array[i].handle)
         if (userData) {
             addedMembers.push({
                 name: `${userData.firstName} ${userData.lastName}`,
@@ -36,7 +35,7 @@ const notifyMembers = async (
     ajoCode: string
 ): Promise<boolean> => {
     for (let i = 0; i < array.length; i++) {
-        const userData = await findUserByHandle(User, array[i].handle)
+        const userData = await findUserByHandle(array[i].handle)
         if (userData) {
             await createNotification(userHandle, userData.handle, userFirstName, ajoId, ajoCode)
         }
@@ -44,7 +43,7 @@ const notifyMembers = async (
     return true
 }
 
-const findUserByHandle = async (User: mongoose.Model<IUser>, searchValue: string): Promise<IUser> => {
+const findUserByHandle = async (searchValue: string): Promise<IUser> => {
     const data = await User.findOne({ handle: searchValue })
     return data
 }
@@ -58,7 +57,7 @@ const addNewMember = async (
     const res: Result = {}
     const addedMembers = []
     for (let i = 0; i < array.length; i++) {
-        const userData = await findUserByHandle(User, array[i].handle)
+        const userData = await findUserByHandle(array[i].handle)
         if (userData) {
             const ajoData = await Ajo.findOne({ ajo_code })
             const isExist = ajoData.members.find((member: IAjoMember) => member.handle === array[i].handle)
