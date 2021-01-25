@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import { DetectResult } from "node-device-detector"
 
 export interface IUser extends mongoose.Document {
     userID: mongoose.Types.ObjectId
@@ -39,7 +40,10 @@ export interface ITransaction extends mongoose.Document {
     recipient_bank: string
     recipient_accountNumber: string
     deviceIp: string
-    deviceType: string
+    deviceInfo: {
+        device: DetectResult
+        userAgent: string
+    }
     reason: string
     amount: string
     ref: string

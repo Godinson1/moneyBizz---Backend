@@ -51,7 +51,10 @@ const fundAccount = async (req: Request, res: Response): Promise<Response> => {
                     amount,
                     ref: chargeResponse.data.data.reference,
                     deviceIp: getUserIp(req),
-                    deviceType: req.device.client.name,
+                    deviceInfo: {
+                        device: req.device,
+                        userAgent: req.useragent
+                    },
                     executedAt: Date.now(),
                     createdAt: Date.now(),
                     executed: false,

@@ -41,8 +41,8 @@ const transactionSchema = new Schema(
         deviceIp: {
             type: String
         },
-        deviceType: {
-            type: String
+        deviceInfo: {
+            type: Object
         },
         ref: {
             type: String
