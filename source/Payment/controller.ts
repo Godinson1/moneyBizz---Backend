@@ -3,6 +3,7 @@ import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction } from "../models"
 import { OTP_URL, BALANCE, validateIP, makeRequest } from "./index"
+import { handleResponse, success, error } from "../Utility"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
 
@@ -12,6 +13,8 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
     try {
         try {
             const userData = await User.findOne({ _id: req.user.id })
+            if (!userData) return handleResponse(res, error, BAD_REQUEST, "You can't carry out this operation..")
+
             const data = JSON.stringify({
                 otp,
                 reference: userData.ref
@@ -27,29 +30,23 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
                 transactionData.executed = true
                 const trans = await transactionData.save()
                 return res.status(OK).json({
-                    status: "success",
+                    status: success,
                     message: "Payment attempted successfully",
                     data: trans
                 })
             } else {
-                return res.status(INTERNAL_SERVER_ERROR).json({
-                    status: "error",
-                    message: "Something went wrong"
-                })
+                return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
             }
-        } catch (error) {
-            console.log(error)
+        } catch (err) {
+            console.log(err)
             return res.status(BAD_REQUEST).json({
-                status: "error",
-                message: error.response?.data
+                status: error,
+                message: err.response?.data
             })
         }
-    } catch (error) {
-        console.log(error)
-        return res.status(INTERNAL_SERVER_ERROR).json({
-            status: "error",
-            message: "Something went wrong"
-        })
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
     }
 }
 
@@ -81,12 +78,9 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         }
 
         return res.status(OK)
-    } catch (error) {
-        console.log("Consoling error", error)
-        return res.status(INTERNAL_SERVER_ERROR).json({
-            status: "error",
-            message: "Something went wrong"
-        })
+    } catch (err) {
+        console.log("Consoling error", err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
     }
 }
 
@@ -100,15 +94,12 @@ const checkBalance = async (req: Request, res: Response): Promise<Response> => {
         })
 
         return res.status(OK).json({
-            status: "success",
+            status: success,
             data: balanceRes.data
         })
-    } catch (error) {
-        console.log(error)
-        return res.status(INTERNAL_SERVER_ERROR).json({
-            status: "error",
-            message: "Something went wrong"
-        })
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
     }
 }
 
