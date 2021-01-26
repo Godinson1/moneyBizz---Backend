@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction } from "../../../models"
 import { CHARGE_URL, makeRequest } from "../../index"
-import { getUserIp } from "../../../Utility"
+import { getUserIp, handleResponse, success, error } from "../../../Utility"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
 
@@ -28,18 +28,13 @@ const fundAccount = async (req: Request, res: Response): Promise<Response> => {
     try {
         try {
             userData = await User.findOne({ _id: req.user.id })
-            if (!userData) {
-                return res.status(BAD_REQUEST).json({
-                    status: "error",
-                    message: "You can't carry out this operation.."
-                })
-            }
+            if (!userData) return handleResponse(res, error, BAD_REQUEST, "You can't carry out this operation..")
 
             const chargeResponse = await makeRequest(CHARGE_URL, data)
 
             if (chargeResponse) {
                 const newTransaction = new Transaction({
-                    initiator: `${req.user.firstName} ${req.user.lastName}`,
+                    initiatorHandle: `${req.user.handle}`,
                     initiator_phone: req.user.phone,
                     initiator_bankCode: code,
                     initiator_bank: "",
@@ -65,23 +60,17 @@ const fundAccount = async (req: Request, res: Response): Promise<Response> => {
                 await newTransaction.save()
             }
             return res.status(OK).json({
-                status: "success",
+                status: success,
                 message: "Payment attempted successfully",
                 data: chargeResponse.data
             })
-        } catch (error) {
-            console.log(error)
-            return res.status(BAD_REQUEST).json({
-                status: "error",
-                message: "Paystack: An error occured.."
-            })
+        } catch (err) {
+            console.log(err)
+            return handleResponse(res, error, BAD_REQUEST, "Paystack: An error occured..")
         }
-    } catch (error) {
-        console.log(error)
-        return res.status(INTERNAL_SERVER_ERROR).json({
-            status: "error",
-            message: "Something went wrong"
-        })
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
     }
 }
 

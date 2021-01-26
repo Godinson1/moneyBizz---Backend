@@ -1,7 +1,18 @@
-import { IUser, IAjoMember, Notification, User, Ajo } from "../../../models"
+import {
+    IUser,
+    IAjoMember,
+    Notification,
+    User,
+    Ajo,
+    Transaction,
+    INotification,
+    IConnection,
+    ITransaction,
+    Connection
+} from "../../../models"
 import { Result } from "./interface"
 
-const addMember = async (array: Array<{ handle: string }>): Promise<Array<IAjoMember>> => {
+const addMember = async (array: Array<{ handle: string }>, handle: string): Promise<Array<IAjoMember>> => {
     const addedMembers = []
     for (let i = 0; i < array.length; i++) {
         const userData = await findUserByHandle(array[i].handle)
@@ -16,7 +27,7 @@ const addMember = async (array: Array<{ handle: string }>): Promise<Array<IAjoMe
                 total_debit: 0,
                 total_credit: 0,
                 ajo_code: "",
-                active: false
+                active: userData.handle === handle ? true : false
             })
         }
     }
@@ -46,6 +57,25 @@ const notifyMembers = async (
 const findUserByHandle = async (searchValue: string): Promise<IUser> => {
     const data = await User.findOne({ handle: searchValue })
     return data
+}
+
+const findAllByHandle = async (
+    ModelType: string,
+    searchValue: string
+): Promise<Array<INotification | IConnection | ITransaction | undefined>> => {
+    let data
+    if (ModelType === "Notification") {
+        data = await Notification.find({ sender: searchValue })
+        return data
+    } else if (ModelType === "Transaction") {
+        data = await Transaction.find({ initiatorHandle: searchValue })
+        return data
+    } else if (ModelType === "Connection") {
+        data = await Connection.find({ connectorHandle: searchValue })
+        return data
+    } else {
+        return []
+    }
 }
 
 const addNewMember = async (
@@ -106,4 +136,4 @@ const createNotification = async (
     await notify.save()
 }
 
-export { addMember, ajoCode, notifyMembers, findUserByHandle, addNewMember }
+export { addMember, ajoCode, notifyMembers, findUserByHandle, findAllByHandle, addNewMember }

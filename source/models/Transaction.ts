@@ -5,7 +5,7 @@ const Schema = mongoose.Schema
 
 const transactionSchema = new Schema(
     {
-        initiator: {
+        initiatorHandle: {
             type: String
         },
         initiator_phone: {

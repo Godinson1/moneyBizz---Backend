@@ -67,12 +67,6 @@ const UserSchema = new Schema(
         total_debit: {
             type: Number
         },
-        transactions: {
-            type: Array
-        },
-        connections: {
-            type: Array
-        },
         active: {
             type: Boolean
         }

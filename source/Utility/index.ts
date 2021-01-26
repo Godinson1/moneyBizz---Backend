@@ -27,6 +27,13 @@ const hasBotResult = (result: ResultBot): string => {
     return result && result.name
 }
 
+const handleResponse = async (res: Response, status: string, code: number, message: string): Promise<Response> => {
+    return res.status(code).json({
+        status,
+        message
+    })
+}
+
 interface requestUser {
     id: string
     handle: string
@@ -36,4 +43,7 @@ interface requestUser {
     email: string
 }
 
-export { getUserIp, middlewareDetect, hasBotResult, requestUser }
+const error = "error"
+const success = "success"
+
+export { error, success, getUserIp, middlewareDetect, hasBotResult, handleResponse, requestUser }

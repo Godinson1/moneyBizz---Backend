@@ -1,4 +1,4 @@
-import { getAllUser, deleteAllUser, activateUser } from "./controller"
+import { getAllUser, deleteAllUser, activateUser, getUser } from "./controller"
 import { router } from "./routes"
 
-export { getAllUser, router, deleteAllUser, activateUser }
+export { getAllUser, router, deleteAllUser, activateUser, getUser }

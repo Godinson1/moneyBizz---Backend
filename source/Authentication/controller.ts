@@ -4,6 +4,7 @@ import { StatusCodes } from "http-status-codes"
 import { User } from "../models/"
 import { jwtSignUser, sendWelcomeMailWithCode, bizzCode } from "./index"
 import bcrypt from "bcryptjs"
+import { handleResponse, error, success } from "../Utility"
 
 const { BAD_REQUEST, INTERNAL_SERVER_ERROR, CREATED } = StatusCodes
 
@@ -21,16 +22,12 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
 
         if (!valid)
             return res.status(BAD_REQUEST).json({
-                status: "error",
+                status: error,
                 message: errors
             })
 
         const alreadyExist = await User.findOne({ $or: [{ email: { $eq: email } }, { phone: { $eq: phone } }] })
-        if (alreadyExist)
-            return res.status(BAD_REQUEST).json({
-                status: "error",
-                message: `User with email/phone already exist`
-            })
+        if (alreadyExist) return handleResponse(res, error, BAD_REQUEST, `User with email/phone already exist`)
 
         const newUser = new User({
             firstName,
@@ -50,8 +47,6 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
             total_credit: 0,
             total_debit: 0,
             available_balance: 0,
-            connections: [],
-            transactions: [],
             mbCode: bizzCode(),
             active: false
         })
@@ -64,18 +59,15 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
                 const token = jwtSignUser(data)
                 await sendWelcomeMailWithCode(data.mbCode, email, firstName)
                 return res.status(CREATED).json({
-                    status: "success",
+                    status: success,
                     token,
                     message: "Successfully registered"
                 })
             })
         })
-    } catch (error) {
-        console.log(error)
-        return res.status(INTERNAL_SERVER_ERROR).json({
-            status: "error",
-            message: "Something went wrong"
-        })
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
     }
 }
 
@@ -90,33 +82,26 @@ const loginUser = async (req: Request, res: Response): Promise<Response> => {
 
         if (!valid)
             return res.status(BAD_REQUEST).json({
-                status: "error",
+                status: error,
                 message: errors
             })
 
         const userData = await User.findOne({ $or: [{ email: { $eq: data } }, { phone: { $eq: data } }] })
 
-        if (!userData)
-            return res.status(BAD_REQUEST).json({
-                status: "error",
-                message: `User with ${data} does not exist`
-            })
+        if (!userData) return handleResponse(res, error, BAD_REQUEST, `User with ${data} does not exist`)
 
         const isMatched = await bcrypt.compare(password, userData.password)
-        if (!isMatched) res.status(400).json({ message: "Invalid Credentials" })
+        if (!isMatched) return handleResponse(res, error, BAD_REQUEST, "Invalid Credentials")
 
         const token = jwtSignUser(userData)
         return res.status(CREATED).json({
-            status: "success",
+            status: success,
             token,
             message: "Successfully Signed in"
         })
-    } catch (error) {
-        console.log(error)
-        return res.status(INTERNAL_SERVER_ERROR).json({
-            status: "error",
-            message: "Something went wrong"
-        })
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
     }
 }
 

@@ -23,15 +23,13 @@ export interface IUser extends mongoose.Document {
     available_balance: number
     nameOfNextOfKin: string
     phoneOfNextOfKin: string
-    connections: Array<IConnection>
     total_debit: number
     total_credit: number
-    transactions: Array<ITransaction>
 }
 
 export interface ITransaction extends mongoose.Document {
     transactionID: mongoose.Types.ObjectId
-    initiator: string
+    initiatorHandle: string
     initiator_phone: string
     initiator_bank: string
     initiator_bankCode: string
@@ -56,11 +54,11 @@ export interface ITransaction extends mongoose.Document {
 export interface IConnection extends mongoose.Document {
     connectionID: mongoose.Types.ObjectId
     connectorID: string
-    connectorName: string
+    connectorHandle: string
     connectee_accountNumber: number
     connectee_bank: string
     connectee_profilePhoto: string
-    connecteeName: string
+    connecteeHandle: string
 }
 
 export interface IAjo extends mongoose.Document {

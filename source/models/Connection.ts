@@ -5,13 +5,13 @@ const Schema = mongoose.Schema
 
 const connectionSchema = new Schema(
     {
-        connectorName: {
+        connectorHandle: {
             type: String
         },
         connectorID: {
             type: String
         },
-        connecteeName: {
+        connecteeHandle: {
             type: String
         },
         connectee_accountNumber: {
