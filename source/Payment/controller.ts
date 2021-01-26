@@ -52,6 +52,7 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
 
 const webhook = async (req: Request, res: Response): Promise<Response> => {
     let userData
+    let transactionData
 
     try {
         //@ - Todo
@@ -68,6 +69,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
 
         const chargeResponse = req.body
         userData = await User.findOne({ ref: chargeResponse.data.reference })
+        transactionData = await Transaction.findOne({ ref: userData.ref })
 
         if (chargeResponse.event === "charge.success") {
             userData.total_credit += parseInt(chargeResponse.data.amount)
@@ -75,6 +77,12 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             userData.total_balance = balance
             userData.available_balance = balance
             await userData.save()
+        }
+
+        if (chargeResponse.event === "charge.failure") {
+            transactionData.status = "Failed"
+            transactionData.executed = false
+            await transactionData.save()
         }
 
         return res.status(OK)

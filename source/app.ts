@@ -5,6 +5,7 @@ import HttpStatus from "http-status-codes"
 import { ResponseError } from "./error/interface"
 import helmet from "helmet"
 import { middlewareDetect } from "./Utility"
+import fileUpload from "express-fileupload"
 
 //Routes
 import { router as AuthenticationRouter } from "./Authentication"
@@ -28,6 +29,15 @@ app.use(helmet())
 
 //Device Configurations
 app.use(middlewareDetect)
+
+//Uploading file Configurations
+app.use(
+    fileUpload({
+        limits: { fileSize: 50 * 1024 * 1024 },
+        useTempFiles: true,
+        tempFileDir: "/tmp/"
+    })
+)
 
 app.use("/auth", AuthenticationRouter)
 app.use("/user", UserRouter)
