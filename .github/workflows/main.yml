@@ -19,8 +19,8 @@ jobs:
               run: git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/moneybizz.git
 
             - name: Deploy backend to heroku
-              run: git pull
               run: |
-                git add .
-                git commit -m "deploy"
-                git push heroku master
+                  git pull
+                  git add .
+                  git commit -m "deploy"
+                  git push heroku master
