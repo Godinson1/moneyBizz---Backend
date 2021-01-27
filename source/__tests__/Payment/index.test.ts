@@ -14,5 +14,5 @@ describe("Test fot Authentication endpoints", () => {
     it("should return all users in database", async () => {
         const data = await request.get("/user")
         expect(data.status).toEqual(200)
-    })
+    }, 10000)
 })

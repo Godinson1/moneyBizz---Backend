@@ -1,7 +1,8 @@
 import mongoose from "mongoose"
+import { userData } from "./constant"
 
 const connectToTestDB = (): void => {
-    mongoose.connect(`${process.env.MONGO_URL}`, {
+    mongoose.connect(`${process.env.MONGO_DB_URI}`, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true,
@@ -9,4 +10,4 @@ const connectToTestDB = (): void => {
     })
 }
 
-export { connectToTestDB }
+export { connectToTestDB, userData }

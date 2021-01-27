@@ -17,5 +17,5 @@ describe("Test for Authentication endpoints", () => {
         } catch (err) {
             console.log(err)
         }
-    })
+    }, 10000)
 })

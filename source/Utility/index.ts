@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import DeviceDetector, { ResultBot } from "node-device-detector"
-import { connectToTestDB } from "./test"
+import { connectToTestDB, userData } from "./test"
 
 const deviceDetector = new DeviceDetector()
 
@@ -47,4 +47,14 @@ interface requestUser {
 const error = "error"
 const success = "success"
 
-export { error, success, getUserIp, connectToTestDB, middlewareDetect, hasBotResult, handleResponse, requestUser }
+export {
+    error,
+    success,
+    userData,
+    getUserIp,
+    connectToTestDB,
+    middlewareDetect,
+    hasBotResult,
+    handleResponse,
+    requestUser
+}
