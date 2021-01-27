@@ -10,4 +10,8 @@ const connectToTestDB = (): void => {
     })
 }
 
-export { connectToTestDB, userData }
+const closeDBConnection = (): void => {
+    mongoose.connection.close()
+}
+
+export { connectToTestDB, userData, closeDBConnection }

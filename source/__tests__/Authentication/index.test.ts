@@ -1,7 +1,7 @@
 process.env.NODE_ENV = "test"
 import supertest from "supertest"
 import { app } from "../../app"
-import { connectToTestDB, error, userData, success } from "../../Utility"
+import { connectToTestDB, closeDBConnection, error, userData, success } from "../../Utility"
 import { StatusCodes } from "http-status-codes"
 import { User } from "../../models"
 
@@ -17,6 +17,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
     await User.deleteMany({})
+    closeDBConnection()
 })
 
 describe("Test fot Authentication endpoints", () => {

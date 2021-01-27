@@ -1,7 +1,7 @@
 process.env.NODE_ENV = "test"
 import supertest from "supertest"
 import { app } from "../../app"
-import { connectToTestDB } from "../../Utility"
+import { connectToTestDB, closeDBConnection } from "../../Utility"
 
 const request = supertest(app)
 jest.useFakeTimers()
@@ -9,6 +9,10 @@ jest.useFakeTimers()
 beforeAll(async () => {
     connectToTestDB()
 }, 10000)
+
+afterAll(() => {
+    closeDBConnection()
+})
 
 describe("Test fot Authentication endpoints", () => {
     it("should return all users in database", async () => {

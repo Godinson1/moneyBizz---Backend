@@ -10,7 +10,7 @@
     "scripts": {
         "start": "ts-node --files source/server.ts",
         "dev": "nodemon",
-        "test": "jest"
+        "test": "jest --runInBand --detectOpenHandles"
     },
     "keywords": [],
     "author": "",
