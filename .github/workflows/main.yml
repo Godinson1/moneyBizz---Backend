@@ -20,4 +20,7 @@ jobs:
 
             - name: Deploy backend to heroku
               run: git pull
-              run: git push heroku master
+              run: |
+                git add .
+                git commit -m "deploy"
+                git push heroku master
