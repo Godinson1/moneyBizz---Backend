@@ -6,9 +6,9 @@ jobs:
     builds:
         runs-on: Ubuntu latest
         steps:
-            - uses: actions/checkout@v2
-            - uses: actions/heroku@master
-            - with:
+             uses: actions/checkout@v2
+             uses: actions/heroku@master
+             with:
                   heroku_api_key: $${{secret.HEROKU_API_KEY}}
                   heroku_app_name: moneybizz
                   heroku_email: josephgodwin274@yahoo.com
