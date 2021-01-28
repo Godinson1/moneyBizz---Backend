@@ -21,8 +21,8 @@ jobs:
                   node-version: ${{ matrix.node-version }}
             - run: npm install
             - run: npm test
-            - uses: akhileshns/heroku-deploy@v3.8.9 # This is the action
+            - uses: akhileshns/heroku-deploy@v3.8.9
               with:
                   heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-                  heroku_app_name: moneybizz #Must be unique in Heroku
+                  heroku_app_name: moneybizz
                   heroku_email: josephgodwin274@yahoo.com

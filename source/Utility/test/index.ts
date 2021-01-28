@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import { userData } from "./constant"
+import { userData, regData } from "./constant"
 
 const connectToTestDB = (): void => {
     mongoose.connect(`${process.env.MONGO_DB_URI}`, {
@@ -14,4 +14,4 @@ const closeDBConnection = (): void => {
     mongoose.connection.close()
 }
 
-export { connectToTestDB, userData, closeDBConnection }
+export { connectToTestDB, userData, regData, closeDBConnection }

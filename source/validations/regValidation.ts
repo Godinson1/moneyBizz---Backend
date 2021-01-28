@@ -19,7 +19,7 @@ const validateReg = ({
     else if (!isValidPhone(phone)) errors.phone = "Must be a valid Nigeria Phone number"
 
     if (isEmpty(firstName)) errors.firstName = "First Name must not be empty"
-    if (isEmpty(lastName)) errors.firstName = "Last Name must not be empty"
+    if (isEmpty(lastName)) errors.lastName = "Last Name must not be empty"
 
     return {
         errors,

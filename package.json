@@ -10,7 +10,7 @@
     "scripts": {
         "start": "ts-node --files source/server.ts",
         "dev": "nodemon",
-        "test": "jest --runInBand --detectOpenHandles --forceExit"
+        "test": "jest --watch --runInBand --detectOpenHandles --forceExit"
     },
     "keywords": [],
     "author": "",

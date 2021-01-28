@@ -6,7 +6,7 @@ import { jwtSignUser, sendWelcomeMailWithCode, bizzCode } from "./index"
 import bcrypt from "bcryptjs"
 import { handleResponse, error, success } from "../Utility"
 
-const { BAD_REQUEST, INTERNAL_SERVER_ERROR, CREATED } = StatusCodes
+const { BAD_REQUEST, INTERNAL_SERVER_ERROR, CREATED, OK } = StatusCodes
 
 const registerUser = async (req: Request, res: Response): Promise<Response | void> => {
     try {
@@ -94,7 +94,7 @@ const loginUser = async (req: Request, res: Response): Promise<Response> => {
         if (!isMatched) return handleResponse(res, error, BAD_REQUEST, "Invalid Credentials")
 
         const token = jwtSignUser(userData)
-        return res.status(CREATED).json({
+        return res.status(OK).json({
             status: success,
             token,
             message: "Successfully Signed in"

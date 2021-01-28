@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import DeviceDetector, { ResultBot } from "node-device-detector"
-import { connectToTestDB, userData, closeDBConnection } from "./test"
+import { connectToTestDB, userData, regData, closeDBConnection } from "./test"
 
 const deviceDetector = new DeviceDetector()
 
@@ -57,5 +57,6 @@ export {
     hasBotResult,
     handleResponse,
     requestUser,
-    closeDBConnection
+    closeDBConnection,
+    regData
 }

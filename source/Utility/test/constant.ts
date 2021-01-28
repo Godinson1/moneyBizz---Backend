@@ -6,4 +6,12 @@ const userData = {
     password: "123456"
 }
 
-export { userData }
+const regData = {
+    email: "test@gmail.com",
+    phone: "09037373333",
+    firstName: "Test",
+    lastName: "Me",
+    password: "test123"
+}
+
+export { userData, regData }
