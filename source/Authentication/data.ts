@@ -41,7 +41,7 @@ const fundWalletBody = (firstName: string, amount: string, reference: string, da
 }
 
 const validateAmount = (data: string): number => {
-    const result = data.substring(0, data.length - 2)
+    const result = data.toString().substring(0, data.length - 2)
     return parseInt(result)
 }
 
