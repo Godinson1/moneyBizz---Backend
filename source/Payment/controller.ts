@@ -1,9 +1,9 @@
-import axios from "axios"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction } from "../models"
-import { OTP_URL, BALANCE, validateIP, makeRequest } from "./index"
-import { handleResponse, success, error } from "../Utility"
+import { OTP_URL, BALANCE, validateIP, makeGetRequest, makeRequest } from "./index"
+import { handleResponse, success, error, type } from "../Utility"
+import { sendTransactionMail } from "../Authentication"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
 
@@ -77,6 +77,15 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             userData.total_balance = balance
             userData.available_balance = balance
             await userData.save()
+            await sendTransactionMail(
+                type.FUND,
+                userData.email,
+                userData.firstName,
+                chargeResponse.data.amount,
+                chargeResponse.data.reference,
+                transactionData.reason,
+                chargeResponse.data.paid_at
+            )
         }
 
         if (chargeResponse.event === "charge.failure") {
@@ -94,13 +103,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
 
 const checkBalance = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const balanceRes = await axios.get(`${BALANCE}`, {
-            headers: {
-                Authorization: `Bearer ${process.env.testKey}`,
-                "Content-Type": "application/json"
-            }
-        })
-
+        const balanceRes = await makeGetRequest(BALANCE)
         return res.status(OK).json({
             status: success,
             data: balanceRes.data

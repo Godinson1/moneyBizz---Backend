@@ -46,6 +46,11 @@ interface requestUser {
 
 const error = "error"
 const success = "success"
+const type = {
+    TRANSFER: "transfer",
+    FUND: "fund",
+    AJO: "ajo"
+}
 
 export {
     error,
@@ -58,5 +63,6 @@ export {
     handleResponse,
     requestUser,
     closeDBConnection,
-    regData
+    regData,
+    type
 }

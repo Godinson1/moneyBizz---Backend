@@ -14,9 +14,9 @@ afterAll(() => {
     closeDBConnection()
 })
 
-describe("Test fot Authentication endpoints", () => {
-    it("should return all users in database", async () => {
-        const data = await request.get("/user")
+describe("Test for Funding wallet", () => {
+    it("should create a charge request depending on otp", async () => {
+        const data = await request.post("/pay/fund")
         expect(data.status).toEqual(200)
     }, 10000)
 })

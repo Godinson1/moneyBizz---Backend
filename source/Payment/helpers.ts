@@ -21,4 +21,14 @@ const makeRequest = async (url: string, data: string): Promise<AxiosResponse> =>
     return chargeResponse
 }
 
-export { validateAmount, validateIP, makeRequest }
+const makeGetRequest = async (url: string): Promise<AxiosResponse> => {
+    const data = await axios.get(url, {
+        headers: {
+            Authorization: `Bearer ${process.env.testKey}`,
+            "Content-Type": "application/json"
+        }
+    })
+    return data
+}
+
+export { validateAmount, validateIP, makeRequest, makeGetRequest }

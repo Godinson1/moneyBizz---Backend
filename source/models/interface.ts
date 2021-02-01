@@ -10,9 +10,17 @@ export interface IUser extends mongoose.Document {
     handle: string
     email: string
     address: string
+    lgaOfAddress: string
+    phoneTwo: string
     sex: string
+    stateOfOrigin: string
+    lgaStateOfOrigin: string
     mbCode: string
     active: boolean
+    bvn: string
+    bvnOtp: number
+    bvnConfirmed: boolean
+    bvnBlacklisted: boolean
     bank: string
     bankCode: string
     accountNumber: string

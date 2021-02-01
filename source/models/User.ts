@@ -26,7 +26,19 @@ const UserSchema = new Schema(
         mbCode: {
             type: String
         },
+        phoneTwo: {
+            type: String
+        },
         address: {
+            type: String
+        },
+        lgaOfAddress: {
+            type: String
+        },
+        stateOfOrigin: {
+            type: String
+        },
+        lgaStateOfOrigin: {
             type: String
         },
         phone: {
@@ -45,6 +57,15 @@ const UserSchema = new Schema(
         },
         bvn: {
             type: Number
+        },
+        bvnOtp: {
+            type: Number
+        },
+        bvnBlacklisted: {
+            type: Boolean
+        },
+        bvnConfirmed: {
+            type: Boolean
         },
         nameOfNextOfKin: {
             type: String

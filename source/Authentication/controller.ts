@@ -10,13 +10,13 @@ const { BAD_REQUEST, INTERNAL_SERVER_ERROR, CREATED, OK } = StatusCodes
 
 const registerUser = async (req: Request, res: Response): Promise<Response | void> => {
     try {
-        const { email, firstName, lastName, phone, password } = req.body
+        const { email, firstName, lastName, handle, password } = req.body
 
         const { errors, valid } = validateReg({
             email,
             firstName,
             lastName,
-            phone,
+            handle,
             password
         })
 
@@ -26,20 +26,30 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
                 message: errors
             })
 
-        const alreadyExist = await User.findOne({ $or: [{ email: { $eq: email } }, { phone: { $eq: phone } }] })
-        if (alreadyExist) return handleResponse(res, error, BAD_REQUEST, `User with email/phone already exist`)
+        const alreadyExist = await User.findOne({ $or: [{ email: { $eq: email } }, { handle: { $eq: handle } }] })
+        if (alreadyExist) return handleResponse(res, error, BAD_REQUEST, `User with email/handle already exist`)
 
         const newUser = new User({
             firstName,
             lastName,
             dateOfBirth: "",
-            phone,
+            phone: "",
             password,
             email,
             address: "",
             sex: "",
             ref: "",
-            handle: `${firstName}_${lastName}`,
+            lgaOfAddress: "",
+            phoneTwo: "",
+            stateOfOrigin: "",
+            bank: "",
+            bankCode: "",
+            bvn: "",
+            bvnOtp: "",
+            bvnConfirmed: false,
+            bvnBlacklisted: true,
+            lgaStateOfOrigin: "",
+            handle,
             profile_photo: "",
             nameOfNextOfKin: "",
             phoneOfNextOfKin: "",

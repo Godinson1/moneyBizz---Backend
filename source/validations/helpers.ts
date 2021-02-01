@@ -11,7 +11,7 @@ const isEmail = (data: string): boolean => {
     else return false
 }
 
-const isValidPhone = (data: string): boolean => {
+const isValidNumber = (data: string): boolean => {
     if (data.trim().length === 11) return true
     else return false
 }
@@ -21,4 +21,4 @@ const isGreater = (data: string): boolean => {
     else return false
 }
 
-export { isEmpty, isEmail, isGreater, isValidPhone }
+export { isEmpty, isEmail, isGreater, isValidNumber }

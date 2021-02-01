@@ -3,7 +3,7 @@ export interface userData {
     lastName: string
     email: string
     password: string
-    phone: string
+    handle: string
 }
 
 export interface loginData {

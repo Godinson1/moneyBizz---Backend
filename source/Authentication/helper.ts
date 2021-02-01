@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken"
 import { IUser } from "../models"
 import nodemailer from "nodemailer"
+import { type } from "../Utility"
+import { welcomeBody, welcomeHeader, fundWalletBody, fundWalletHeader } from "./index"
 
 const jwtSignUser = (user: IUser): string => {
     const ONE_WEEK = 60 * 60 * 24 * 7
@@ -15,7 +17,7 @@ const bizzCode = (): string => {
     return `MB${Math.floor(100000 + Math.random() * 900000)}`
 }
 
-const sendWelcomeMailWithCode = (id: string, email: string, firstName: string): void => {
+const sendWelcomeMailWithCode = (code: string, email: string, firstName: string): void => {
     const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -27,16 +29,8 @@ const sendWelcomeMailWithCode = (id: string, email: string, firstName: string): 
     const mailOptions = {
         from: process.env.EMAIL,
         to: email,
-        subject: `Welcome to MoneyBizz `,
-        html: `<h2>&#9995; Hi ${firstName}</h2> 
-               <p>Thank you for choosing to join the FORCE as a MoneyBizzer.<br>
-               <br>
-               Your unique code is <b>${id}</b>
-               <br> Thank you once again!</p> 
-               <br><br>
-               <b>All the best!</b>
-               <br>
-               <b>Team MoneyBizz<b>`
+        subject: welcomeHeader(),
+        html: welcomeBody(code, firstName)
     }
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -48,4 +42,41 @@ const sendWelcomeMailWithCode = (id: string, email: string, firstName: string): 
     })
 }
 
-export { jwtSignUser, sendWelcomeMailWithCode, bizzCode }
+const sendTransactionMail = (
+    emailType: string,
+    email: string,
+    firstName: string,
+    amount: string,
+    reference: string,
+    reason: string,
+    date: string
+): void => {
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD
+        }
+    })
+
+    const mailOptions = {
+        from: process.env.EMAIL,
+        to: email,
+        subject: emailType === type.FUND ? fundWalletHeader(firstName, amount, reference) : "In Progress",
+        html: emailType === type.FUND ? fundWalletBody(firstName, amount, reference, date, reason) : "In Progress"
+    }
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log(error)
+        } else {
+            console.log("Email sent: " + info.response)
+        }
+    })
+}
+
+const sendMobileOTP = (data: number): string => {
+    return `${data}`
+}
+
+export { jwtSignUser, sendWelcomeMailWithCode, sendMobileOTP, bizzCode, sendTransactionMail }
