@@ -29,6 +29,17 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
                 transactionData.initiator_bank = otpRes.data.data.authorization.bank
                 transactionData.executed = true
                 const trans = await transactionData.save()
+                //This mail will be sent from the webhook endpoint
+                //After payment has been confirmed.. Currently testing here..
+                await sendTransactionMail(
+                    type.FUND,
+                    userData.email,
+                    userData.firstName,
+                    trans.amount,
+                    trans.ref,
+                    trans.reason,
+                    trans.executedAt
+                )
                 return res.status(OK).json({
                     status: success,
                     message: "Payment attempted successfully",
