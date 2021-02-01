@@ -25,7 +25,7 @@ const fundWalletBody = (firstName: string, amount: string, reference: string, da
     <p>Your MoneyBizz bizz wallet has been credited successfully.<br>
     <br>
     <b>Transaction Details</b>
-    <br>Amount: <b style="color: green;">${amount}</b></p> 
+    <br>Amount: <b style="color: green;">${formatter.format(validateAmount(amount))}</b></p> 
     <br><br>
     Reason: ${reason}
     <br><br>
