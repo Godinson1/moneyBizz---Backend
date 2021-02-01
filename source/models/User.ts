@@ -17,7 +17,9 @@ const UserSchema = new Schema(
             type: String
         },
         handle: {
-            type: String
+            type: String,
+            unique: true,
+            required: true
         },
         email: {
             type: String,
@@ -42,9 +44,7 @@ const UserSchema = new Schema(
             type: String
         },
         phone: {
-            type: String,
-            unique: true,
-            required: true
+            type: String
         },
         sex: {
             type: String

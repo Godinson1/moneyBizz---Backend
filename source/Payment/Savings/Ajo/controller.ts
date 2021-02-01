@@ -67,7 +67,7 @@ const activateAjo = async (req: Request, res: Response): Promise<Response> => {
         ajoData = await Ajo.findOne({ ajo_code })
         if (!ajoData) return handleResponse(res, error, NOT_FOUND, "Ajo account not found")
 
-        const ajoIndex = ajoData.members.findIndex((member: IAjoMember) => member.phone === req.user.phone)
+        const ajoIndex = ajoData.members.findIndex((member: IAjoMember) => member.handle === req.user.handle)
         if (ajoIndex === -1) return handleResponse(res, error, NOT_FOUND, "You are not a member of this Ajo account")
 
         if (ajoData.members[ajoIndex].active === true) {

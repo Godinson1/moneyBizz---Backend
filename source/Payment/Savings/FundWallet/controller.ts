@@ -35,7 +35,7 @@ const fundAccount = async (req: Request, res: Response): Promise<Response> => {
             if (chargeResponse) {
                 const newTransaction = new Transaction({
                     initiatorHandle: `${req.user.handle}`,
-                    initiator_phone: req.user.phone,
+                    initiator_phone: "",
                     initiator_bankCode: code,
                     initiator_bank: "",
                     initiator_accountNumber: account_number,
