@@ -47,9 +47,11 @@ interface requestUser {
 const error = "error"
 const success = "success"
 const type = {
+    WELCOME: "welcome",
     TRANSFER: "transfer",
     FUND: "fund",
-    AJO: "ajo"
+    AJO: "ajo",
+    PASSWORD_RESET: "password_reset"
 }
 
 export {

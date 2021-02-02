@@ -3,6 +3,7 @@ import { IUser } from "../models"
 import nodemailer from "nodemailer"
 import { type } from "../Utility"
 import { welcomeBody, welcomeHeader, fundWalletBody, fundWalletHeader } from "./index"
+import { resetPasswordBody, resetPasswordHeader } from "./data"
 
 const jwtSignUser = (user: IUser): string => {
     const ONE_WEEK = 60 * 60 * 24 * 7
@@ -17,7 +18,11 @@ const bizzCode = (): string => {
     return `MB${Math.floor(100000 + Math.random() * 900000)}`
 }
 
-const sendWelcomeMailWithCode = (code: string, email: string, firstName: string): void => {
+const uniqueCode = (): number => {
+    return Math.floor(100000 + Math.random() * 900000)
+}
+
+const sendAuthMail = (emailType: string, code: string, email: string, firstName: string): void => {
     const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -29,8 +34,8 @@ const sendWelcomeMailWithCode = (code: string, email: string, firstName: string)
     const mailOptions = {
         from: process.env.EMAIL,
         to: email,
-        subject: welcomeHeader(),
-        html: welcomeBody(code, firstName)
+        subject: emailType === type.WELCOME ? welcomeHeader() : resetPasswordHeader(),
+        html: emailType === type.WELCOME ? welcomeBody(code, firstName) : resetPasswordBody(code, firstName)
     }
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -79,4 +84,4 @@ const sendMobileOTP = (data: number): string => {
     return `${data}`
 }
 
-export { jwtSignUser, sendWelcomeMailWithCode, sendMobileOTP, bizzCode, sendTransactionMail }
+export { jwtSignUser, sendAuthMail, uniqueCode, sendMobileOTP, bizzCode, sendTransactionMail }

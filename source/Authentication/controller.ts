@@ -2,9 +2,9 @@ import { Request, Response } from "express"
 import { validateLogin, validateReg } from "../validations"
 import { StatusCodes } from "http-status-codes"
 import { User } from "../models/"
-import { jwtSignUser, sendWelcomeMailWithCode, bizzCode } from "./index"
+import { jwtSignUser, sendAuthMail, bizzCode } from "./index"
 import bcrypt from "bcryptjs"
-import { handleResponse, error, success } from "../Utility"
+import { handleResponse, error, success, type } from "../Utility"
 
 const { BAD_REQUEST, INTERNAL_SERVER_ERROR, CREATED, OK } = StatusCodes
 
@@ -67,7 +67,7 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
                 newUser.password = hash
                 const data = await newUser.save()
                 const token = jwtSignUser(data)
-                await sendWelcomeMailWithCode(data.mbCode, email, firstName)
+                await sendAuthMail(type.WELCOME, data.mbCode, email, firstName)
                 return res.status(CREATED).json({
                     status: success,
                     token,

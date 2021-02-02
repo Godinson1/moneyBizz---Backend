@@ -16,6 +16,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@google-cloud/storage": "^5.7.4",
         "@types/bcryptjs": "^2.4.2",
         "@types/cors": "^2.8.7",
         "@types/express-fileupload": "^1.1.4",

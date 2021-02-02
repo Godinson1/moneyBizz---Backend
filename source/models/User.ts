@@ -56,7 +56,7 @@ const UserSchema = new Schema(
             type: String
         },
         bvn: {
-            type: Number
+            type: String
         },
         bvnOtp: {
             type: Number

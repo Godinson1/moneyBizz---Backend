@@ -10,3 +10,8 @@ export interface loginData {
     data: string
     password: string
 }
+
+export interface passwordData {
+    code: string
+    password: string
+}

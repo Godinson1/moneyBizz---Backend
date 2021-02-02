@@ -1,10 +1,10 @@
 import { loginData, isEmpty, isEmail, isGreater } from "./index"
 
 const checkData = (data: string): string => {
-    if (data.trim().startsWith("0")) {
-        return "phone"
+    if (!!~data.toString().indexOf("@")) {
+        return "email"
     }
-    return "email"
+    return "handle"
 }
 
 const validateLogin = ({ data, password }: loginData): { errors: loginData; valid: boolean } => {
@@ -12,6 +12,11 @@ const validateLogin = ({ data, password }: loginData): { errors: loginData; vali
 
     if (checkData(data) === "email") {
         if (isEmpty(data)) errors.data = "Email must not be empty"
+        else if (!isEmail(data)) errors.data = "Must be a valid email address"
+    }
+
+    if (checkData(data) === "handle") {
+        if (isEmpty(data)) errors.data = "Handle must not be empty"
         else if (!isEmail(data)) errors.data = "Must be a valid email address"
     }
 

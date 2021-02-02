@@ -1,0 +1,12 @@
+{
+    "type": "service_account",
+    "project_id": "adept-script-279305",
+    "private_key_id": "28abdc4a0ddade63abb74848f34a79c4ff54ad6c",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCwaJnqhQF5IVHj\nUB5tjQn7nA3XEifUn1Xhxh7zDpF3pT9avEp5ooeRmaPCnmAX8z+gpyHUaCGkSuOu\nmXtd44ByfoRBVPLZYMP4pq/dj8zAO2VHfXdVca+mJpG1C9o2oXTN9lzNnGRPZ4pI\nyAR3varrLBxlfZWfYncVrvAseaqr+csa36lMGqfpFRWVRP10CWylHlEJCpKplpKg\ng3anFdpbQi8zEXJZfTclRYbeN+RlwC3V8NsYM7FX9SNxaebhwSRZTO9CkD6XIru2\n5vCIvIGsG6NZIdADN8dbMOMdNa24cnrd61KVBqB+OMGk+MOMetytECUxLZ4KnwhA\ngAd75i6RAgMBAAECggEADnqXX3NJOqrscK7LwIwZ7KfTTvqzgDUPtHcxZRul/t72\nQzk/F5qqa93jXf7nvi994m61TRy63iQzaco5IOyiR0NxEXeqcwMJMqhjuNiron99\ngY+fssig9Q8nWGe/okpALwNwfIPAi+/gnraj/zv3AlRdhEr5c9p+Ea6JEe1uf6ze\nzUpqHm4396XTQCN5xXu7G7SkQS9jJrzIyPgyzh1DarSO0lE9lNdXdy6GxPwEYrc6\nEXv4tGfnCNKR0ZOhUdRZaaRxrwoKAtS5KZ33fvco0/7fDRSkZ92H6SR+27cmkZqZ\nkd4ayvrFSlVLSs+2fGG3REjW4Alh8ELyPjRqpaEVnQKBgQDuJxWi3yD1Xq3ytxJp\nN7bczzC60atVzfnIbuGQT/ppepDGh8w0gTdIY7ICGeE6hzjBpQzBoMDIR56Ac9qE\nanW9l42OvZO6LWjF24hFF1W8xh2V/IQX1TbuIohRWJvRFG7M08EdXoXbA4nIH0jR\nx8l4rw91DDs+XYKPgGHA2kp7SwKBgQC9oPfKIiTYSa/cxBUTc8qcC9COqEdIXore\nw/roj+3qz6f14cLLnnOzt3B+LMRAXpI8hF3I07OprwfXMUWS2H6BE2xQB4u4fECl\nvhgh2zdIGoBPhINgrjhyfBPj8z3BwzoeDNh1yroPVnxCST6cz61cqbYaYGzUlI8Z\nFRZJlHAYEwKBgGgF5mt37tt+eZh04rPWxCb60RwpDR+zkpE77YatiIGeKbKuCkI8\n1rrl4REN4NVBz0a2IzZIUyyoK9GLyTzhi4A+vHRG1koSH5uc4o7bPHXyS2YCIGiQ\nlye5KbXucFEJDcSmEcoUSX96sioZkCMhkx0FykikCRSan7ayqwAj2Ti1AoGBAIAz\nWjKi4MwFDUswmZscFmdnKWm45PBNUo+GaZRe8hdkqoX2Sm7Ewi5HH1t+QnPOPAmD\n56/FSFq4hZF7szCzAtua2QhGAbUI89/Z45DIFti9ae/Yg8WSI4Fq1zuuEBt2NE1q\nm9EO7Lk/3CQoRpdXZDoYVpAAjrMteI0Zj4bRPvNXAoGAX/W9IediG2D4XF8vn5dl\nx4CioOu0nmkRDi7vBxcvKQI9yNNNc3SvQe5a5QqtumBsJf8C6K/0nelAYp26p6Gf\nCLU/D45hfZgDI50nJt8j16G2a+n+GSFGLIBGx2Jgp35JfKPKYUyfuZNPriiUCfyj\n/LoYUddQWUSvH7SGtLkqgpQ=\n-----END PRIVATE KEY-----\n",
+    "client_email": "bizzer@adept-script-279305.iam.gserviceaccount.com",
+    "client_id": "113934297090489396758",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/bizzer%40adept-script-279305.iam.gserviceaccount.com"
+}
