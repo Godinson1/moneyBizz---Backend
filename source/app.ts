@@ -33,9 +33,7 @@ app.use(middlewareDetect)
 //Uploading file Configurations
 app.use(
     fileUpload({
-        limits: { fileSize: 50 * 1024 * 1024 },
-        useTempFiles: true,
-        tempFileDir: "/tmp/"
+        limits: { fileSize: 50 * 1024 * 1024 }
     })
 )
 

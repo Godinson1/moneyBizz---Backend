@@ -8,58 +8,58 @@ import { User } from "../../models"
 const request = supertest(app)
 const { BAD_REQUEST, CREATED, OK, INTERNAL_SERVER_ERROR } = StatusCodes
 
-jest.useFakeTimers()
-
 beforeAll(async () => {
     connectToTestDB()
 }, 10000)
 
 afterAll(async () => {
-    await User.deleteMany({ email: { $ne: userData.email } })
+    await User.deleteMany({ email: {$ne:  userData.email } })
     closeDBConnection()
 })
 
+jest.useFakeTimers()
+
 describe("Test for Authentication endpoints - Register", () => {
     it("should fail for any empty field", async () => {
-        const data = { email: "", phone: "", firstName: "", lastName: "", password: "test123" }
-        const result = await request.post("/auth/login").send(data)
+        const data = { email: "", handle: "", firstName: "", lastName: "", password: "test123" }
+        const result = await request.post("/auth/register").send(data)
         expect(result.status).toEqual(BAD_REQUEST)
         expect(result.body.status).toEqual(error)
     })
 
     it("should fail for existing email", async () => {
         const data = {
-            email: "godinson45@gmail.com",
-            phone: "09047646784",
+            email: "godinson100@gmail.com",
+            handle: "hello",
             firstName: "Testing",
             lastName: "Testing",
             password: "test123"
         }
-        const result = await request.post("/auth/login").send(data)
+        const result = await request.post("/auth/register").send(data)
         expect(result.status).toEqual(BAD_REQUEST)
         expect(result.body.status).toEqual(error)
         expect(result.body).toHaveProperty("message")
-        expect(result.body.message).toEqual("User with email/phone already exist")
-    })
+        expect(result.body.message).toEqual(`User with email/handle already exist`)
+    }, 10000)
 
-    it("should fail for existing phone", async () => {
+    it("should fail for existing handle", async () => {
         const data = {
             email: "testing@gmail.com",
-            phone: "08146961062",
+            handle: "godinson",
             firstName: "Testing",
             lastName: "Testing",
             password: "test123"
         }
-        const result = await request.post("/auth/login").send(data)
+        const result = await request.post("/auth/register").send(data)
         expect(result.status).toEqual(BAD_REQUEST)
         expect(result.body.status).toEqual(error)
         expect(result.body).toHaveProperty("message")
-        expect(result.body.message).toEqual("User with email/phone already exist")
-    })
+        expect(result.body.message).toEqual("User with email/handle already exist")
+    }, 10000)
 
     it("should fail for missing fields", async () => {
         const data = { firstName: "", lastName: "", password: "test123" }
-        const result = await request.post("/auth/login").send(data)
+        const result = await request.post("/auth/register").send(data)
         expect(result.status).toEqual(INTERNAL_SERVER_ERROR)
         expect(result.body.status).toEqual(error)
     }, 10000)
@@ -97,7 +97,7 @@ describe("Test for Authentication endpoints - Login", () => {
     }, 10000)
 
     it("should login successfully", async () => {
-        const data = { data: "godinson45@gmail.com", password: "123456" }
+        const data = { data: "godinson100@gmail.com", password: "123456" }
         const result = await request.post("/auth/login").send(data)
         expect(result.status).toEqual(OK)
         expect(result.body.status).toEqual(success)

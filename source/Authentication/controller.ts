@@ -76,7 +76,7 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
             })
         })
     } catch (err) {
-        console.log(err)
+        console.log(err.response)
         return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
     }
 }
@@ -96,7 +96,7 @@ const loginUser = async (req: Request, res: Response): Promise<Response> => {
                 message: errors
             })
 
-        const userData = await User.findOne({ $or: [{ email: { $eq: data } }, { phone: { $eq: data } }] })
+        const userData = await User.findOne({ $or: [{ email: { $eq: data } }, { handle: { $eq: data } }] })
 
         if (!userData) return handleResponse(res, error, BAD_REQUEST, `User with ${data} does not exist`)
 

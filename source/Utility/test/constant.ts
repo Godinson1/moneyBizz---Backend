@@ -1,14 +1,14 @@
 const userData = {
     firstName: "Joseph",
     lastName: "Godwin",
-    email: "godinson45@gmail.com",
-    phone: "08146961062",
+    email: "godinson100@gmail.com",
+    handle: "godinson",
     password: "123456"
 }
 
 const regData = {
     email: "test@gmail.com",
-    phone: "09037373333",
+    handle: "testing",
     firstName: "Test",
     lastName: "Me",
     password: "test123"

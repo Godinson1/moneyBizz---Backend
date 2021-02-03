@@ -4,6 +4,7 @@ import nodemailer from "nodemailer"
 import { type } from "../Utility"
 import { welcomeBody, welcomeHeader, fundWalletBody, fundWalletHeader } from "./index"
 import { resetPasswordBody, resetPasswordHeader } from "./data"
+import client from "twilio"
 
 const jwtSignUser = (user: IUser): string => {
     const ONE_WEEK = 60 * 60 * 24 * 7
@@ -80,8 +81,20 @@ const sendTransactionMail = (
     })
 }
 
-const sendMobileOTP = (data: number): string => {
-    return `${data}`
+const sendMobileOTP = async (data: number, phone: string): Promise<void> => {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID
+    const authToken = process.env.TWILIO_AUTH_TOKEN
+
+    const twilioClient = client(accountSid, authToken)
+
+    twilioClient.messages
+        .create({
+            body: `Your bizz code is - ${data}`,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: phone
+        })
+        .then((message) => console.log(message.sid))
+        .catch((error) => console.log(error))
 }
 
 export { jwtSignUser, sendAuthMail, uniqueCode, sendMobileOTP, bizzCode, sendTransactionMail }

@@ -10,7 +10,7 @@ const bucket = storage.bucket("bizz_bucket")
  * @description - This function does the following
  * - It uploads a file to the image bucket on Google Cloud
  * - It accepts an object as an argument with the
- *   "originalname" and "buffer" as keys
+ *   name of file and buffer
  */
 
 export const uploadImage = (file: UploadedFile): Promise<string> =>
@@ -19,7 +19,8 @@ export const uploadImage = (file: UploadedFile): Promise<string> =>
 
         const blob = bucket.file(name.replace(/ /g, "_"))
         const blobStream = blob.createWriteStream({
-            resumable: false
+            resumable: false,
+            gzip: true
         })
         blobStream
             .on("finish", () => {
@@ -30,5 +31,5 @@ export const uploadImage = (file: UploadedFile): Promise<string> =>
                 console.log(err)
                 reject(`Unable to upload image, something went wrong`)
             })
-            .end(JSON.stringify(data))
+            .end(data)
     })

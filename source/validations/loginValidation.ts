@@ -1,7 +1,8 @@
 import { loginData, isEmpty, isEmail, isGreater } from "./index"
 
 const checkData = (data: string): string => {
-    if (!!~data.toString().indexOf("@")) {
+    //const isAvailable = data.toString().indexOf("@") !== -1
+    if (data.indexOf("@") > -1) {
         return "email"
     }
     return "handle"
@@ -17,7 +18,6 @@ const validateLogin = ({ data, password }: loginData): { errors: loginData; vali
 
     if (checkData(data) === "handle") {
         if (isEmpty(data)) errors.data = "Handle must not be empty"
-        else if (!isEmail(data)) errors.data = "Must be a valid email address"
     }
 
     if (isEmpty(password)) errors.password = "Password must not be empty"

@@ -5,9 +5,8 @@ import { StatusCodes } from "http-status-codes"
 import { connectToTestDB, closeDBConnection } from "../../Utility"
 
 const { OK, INTERNAL_SERVER_ERROR } = StatusCodes
-
 const request = supertest(app)
-jest.useFakeTimers()
+
 beforeAll(() => {
     connectToTestDB()
 }, 10000)
@@ -15,6 +14,8 @@ beforeAll(() => {
 afterAll(() => {
     closeDBConnection()
 })
+
+jest.useFakeTimers()
 
 describe("Test for Authentication endpoints", () => {
     it("should return all users in database", async () => {

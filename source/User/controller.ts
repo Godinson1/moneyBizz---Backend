@@ -5,7 +5,7 @@ import { isEmail, isEmpty, isValidNumber, validateResetPassword } from "../valid
 import { findUserByHandle, findAllByHandle, BVN } from "../Payment"
 import { handleResponse, error, success, type } from "../Utility"
 import { makeGetRequest } from "../Payment/helpers"
-import { bizzCode, uniqueCode, sendMobileOTP, sendAuthMail } from "../Authentication"
+import { bizzCode, uniqueCode, sendMobileOTP, validatePhone, sendAuthMail } from "../Authentication"
 import bcrypt from "bcryptjs"
 import { uploadImage } from "./index"
 import { UploadedFile } from "express-fileupload"
@@ -147,7 +147,7 @@ const addBVN = async (req: Request, res: Response): Promise<Response> => {
                     userData.lgaStateOfOrigin = userInfo.lga_of_origin
                     userData.bvnOtp = uniqueCode()
                     const updatedUserData = await userData.save()
-                    await sendMobileOTP(updatedUserData.bvnOtp)
+                    await sendMobileOTP(updatedUserData.bvnOtp, validatePhone(updatedUserData.phoneTwo))
                     return handleResponse(
                         res,
                         success,
@@ -182,7 +182,6 @@ const confirmBVN = async (req: Request, res: Response): Promise<Response | void>
 
     try {
         userData = await User.findOne({ bvnOtp })
-        console.log(userData)
         if (userData) {
             userData.bvnConfirmed = true
             await userData.save()
@@ -276,17 +275,27 @@ const updatePassword = async (req: Request, res: Response): Promise<Response | v
  * Confirm authenticated user and update profile photo
  */
 const updateProfilePhoto = async (req: Request, res: Response): Promise<Response> => {
+    let userData
+    const prefferedTypes = ["image/jpeg", "image/jpg", "image/png"]
     try {
         if (!req.files || req.files === null || Object.keys(req.files).length === 0)
             return handleResponse(res, error, BAD_REQUEST, `Please select a photo`)
 
         if (req.files.mb_image) {
-            console.log(req.files.mb_image)
-            //Add more validations - so users don't post anything aside pictures
             const image = req.files.mb_image as UploadedFile
+            if (!prefferedTypes.includes(image.mimetype))
+                return handleResponse(res, error, BAD_REQUEST, "Please select a valid photo")
+            //Upload image
             const url = await uploadImage(image)
-            //Update user photo here
-            return handleResponse(res, success, OK, url)
+            //Find authenticated user and update photo here
+            userData = await findUserByHandle(req.user.handle)
+            userData.profile_photo = url
+            const data = await userData.save()
+            return res.status(OK).json({
+                status: success,
+                message: "Profile photo updated successfully..",
+                data
+            })
         } else {
             return handleResponse(res, error, BAD_REQUEST, `Please select a photo`)
         }

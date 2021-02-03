@@ -64,10 +64,24 @@ const validateAmount = (data: string): number => {
     return parseInt(result)
 }
 
+const validatePhone = (data: string): string => {
+    const phoneSignal = "+234"
+    const newResult = data.toString().slice(1)
+    return `${phoneSignal}${newResult}`
+}
+
 const formatter = new Intl.NumberFormat("en-NG", {
     style: "currency",
     currency: "NGN",
     minimumFractionDigits: 2
 })
 
-export { resetPasswordHeader, welcomeHeader, fundWalletHeader, welcomeBody, fundWalletBody, resetPasswordBody }
+export {
+    resetPasswordHeader,
+    validatePhone,
+    welcomeHeader,
+    fundWalletHeader,
+    welcomeBody,
+    fundWalletBody,
+    resetPasswordBody
+}
