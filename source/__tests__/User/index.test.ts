@@ -27,14 +27,4 @@ describe("Test for Authentication endpoints", () => {
             expect(err.status).toEqual(INTERNAL_SERVER_ERROR)
         }
     }, 10000)
-
-    it("should return all users in database", async () => {
-        try {
-            const data = await request.delete("/user")
-            expect(data.status).toEqual(OK)
-        } catch (err) {
-            console.log(err)
-            expect(err.status).toEqual(INTERNAL_SERVER_ERROR)
-        }
-    }, 10000)
 })
