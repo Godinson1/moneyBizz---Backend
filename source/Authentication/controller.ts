@@ -76,7 +76,7 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
             })
         })
     } catch (err) {
-        console.log(err.response)
+        console.log(err)
         return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
     }
 }

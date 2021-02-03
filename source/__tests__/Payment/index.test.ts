@@ -1,7 +1,7 @@
 process.env.NODE_ENV = "test"
 import supertest from "supertest"
 import { app } from "../../app"
-import { connectToTestDB, closeDBConnection, userData } from "../../Utility"
+import { connectToTestDB, closeDBConnection } from "../../Utility"
 
 const request = supertest(app)
 let token: string

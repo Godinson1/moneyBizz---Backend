@@ -1,7 +1,7 @@
 process.env.NODE_ENV = "test"
 import supertest from "supertest"
 import { app } from "../../app"
-import { connectToTestDB, closeDBConnection, regData, error, userData, success } from "../../Utility"
+import { connectToTestDB, closeDBConnection, regData, error, success } from "../../Utility"
 import { StatusCodes } from "http-status-codes"
 import { User } from "../../models"
 
@@ -13,7 +13,7 @@ beforeAll(async () => {
 }, 10000)
 
 afterAll(async () => {
-    await User.deleteMany({ email: {$ne:  userData.email } })
+    //await User.findOneAndDelete({ email: regData.email })
     closeDBConnection()
 })
 
