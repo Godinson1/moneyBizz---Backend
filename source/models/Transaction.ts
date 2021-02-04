@@ -47,6 +47,9 @@ const transactionSchema = new Schema(
         ref: {
             type: String
         },
+        type: {
+            type: String
+        },
         executedAt: {
             type: Date
         },

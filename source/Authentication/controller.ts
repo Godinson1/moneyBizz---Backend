@@ -44,6 +44,7 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
             stateOfOrigin: "",
             bank: "",
             bankCode: "",
+            accountNumber: "",
             bvn: "",
             bvnOtp: "",
             bvnConfirmed: false,

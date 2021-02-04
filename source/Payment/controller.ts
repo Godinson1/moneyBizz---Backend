@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction } from "../models"
-import { OTP_URL, BALANCE, validateIP, makeGetRequest, makeRequest } from "./index"
+import { OTP_URL, BALANCE, validateIP, validateAmount, makeGetRequest, makeRequest } from "./index"
 import { handleResponse, success, error, type } from "../Utility"
 import { sendTransactionMail } from "../Authentication"
 
@@ -79,11 +79,15 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         }
 
         const chargeResponse = req.body
+        console.log(chargeResponse.data.reference)
+        console.log(chargeResponse)
         userData = await User.findOne({ ref: chargeResponse.data.reference })
         transactionData = await Transaction.findOne({ ref: userData.ref })
 
+        const amount = validateAmount(chargeResponse.data.amount)
+
         if (chargeResponse.event === "charge.success") {
-            userData.total_credit += parseInt(chargeResponse.data.amount)
+            userData.total_credit += amount
             const balance = userData.total_credit - userData.total_debit
             userData.total_balance = balance
             userData.available_balance = balance
@@ -96,6 +100,23 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
                 chargeResponse.data.reference,
                 transactionData.reason,
                 chargeResponse.data.paid_at
+            )
+        }
+
+        if (chargeResponse.event === "transfer.success") {
+            userData.total_debit += amount
+            const balance = userData.total_credit - userData.total_debit
+            userData.total_balance = balance
+            userData.available_balance = balance
+            await userData.save()
+            await sendTransactionMail(
+                type.DEBIT,
+                userData.email,
+                userData.firstName,
+                chargeResponse.data.amount,
+                chargeResponse.data.transfer_code,
+                transactionData.reason,
+                chargeResponse.data.created_at
             )
         }
 

@@ -3,7 +3,7 @@ import supertest from "supertest"
 import { app } from "../../app"
 import { connectToTestDB, closeDBConnection, regData, error, success } from "../../Utility"
 import { StatusCodes } from "http-status-codes"
-//import { User } from "../../models"
+import { User } from "../../models"
 
 const request = supertest(app)
 const { BAD_REQUEST, CREATED, OK, INTERNAL_SERVER_ERROR } = StatusCodes
@@ -13,7 +13,7 @@ beforeAll(async () => {
 }, 10000)
 
 afterAll(async () => {
-    //await User.findOneAndDelete({ email: regData.email })
+    await User.findOneAndDelete({ email: regData.email })
     closeDBConnection()
 })
 

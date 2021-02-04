@@ -6,6 +6,7 @@ import {
     getUser,
     updatePassword,
     updateProfilePhoto,
+    updateAccountDetails,
     addBVN,
     confirmBVN
 } from "./controller"
@@ -15,6 +16,7 @@ import { uploadImage } from "./helpers"
 export {
     getAllUser,
     updateProfilePhoto,
+    updateAccountDetails,
     router,
     deleteAllUser,
     resetPassword,

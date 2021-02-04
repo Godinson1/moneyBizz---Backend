@@ -57,6 +57,7 @@ export interface ITransaction extends mongoose.Document {
     createdAt: Date
     executed: boolean
     status: string
+    type: string
 }
 
 export interface IConnection extends mongoose.Document {

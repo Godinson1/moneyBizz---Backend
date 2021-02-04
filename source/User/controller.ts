@@ -39,7 +39,7 @@ const getAllUser = async (req: Request, res: Response): Promise<Response> => {
 const getUser = async (req: Request, res: Response): Promise<Response> => {
     try {
         const userData = await findUserByHandle(req.params.id)
-        if (!userData) return handleResponse(res, error, NOT_FOUND, `Users with @${req.params.id} does not exist`)
+        if (!userData) return handleResponse(res, error, NOT_FOUND, `User with @${req.params.id} does not exist`)
 
         const connections = await findAllByHandle("Connection", req.params.id)
         const transactions = await findAllByHandle("Transaction", req.params.id)
@@ -133,6 +133,7 @@ const addBVN = async (req: Request, res: Response): Promise<Response> => {
                 if (response.status === true) {
                     userData = await User.findOne({ handle: req.user.handle })
                     const userInfo = response.data
+                    console.log(userInfo.enrollment_bank)
                     userData.dateOfBirth = userInfo.formatted_dob
                     userData.phone = userInfo.mobile
                     userData.phoneTwo = userInfo.mobile2
@@ -305,6 +306,32 @@ const updateProfilePhoto = async (req: Request, res: Response): Promise<Response
     }
 }
 
+/*
+ * NAME - updateAccountDetails
+ * @REQUEST METHOD - PUT
+ * AIM - Update user's account details - Temporarily
+ */
+const updateAccountDetails = async (req: Request, res: Response): Promise<Response> => {
+    let userData
+    const { handle, code, account_number } = req.body
+    if (!handle || !code || !account_number)
+        return handleResponse(res, error, BAD_REQUEST, `Please fill all required fields`)
+    try {
+        userData = await findUserByHandle(handle)
+        if (userData) {
+            userData.bankCode = code
+            userData.accountNumber = account_number
+            await userData.save()
+            return handleResponse(res, success, OK, `Account details updated successfully..`)
+        } else {
+            return handleResponse(res, error, NOT_FOUND, `User not found`)
+        }
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
+    }
+}
+
 export {
     getAllUser,
     deleteAllUser,
@@ -314,5 +341,6 @@ export {
     getUser,
     addBVN,
     confirmBVN,
-    resetPassword
+    resetPassword,
+    updateAccountDetails
 }

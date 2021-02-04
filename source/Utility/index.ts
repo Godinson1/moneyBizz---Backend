@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import DeviceDetector, { ResultBot } from "node-device-detector"
-import { connectToTestDB, userData, regData, closeDBConnection } from "./test"
+import { connectToTestDB, userData, regData, closeDBConnection, signInTestUser } from "./test"
 
 const deviceDetector = new DeviceDetector()
 
@@ -46,9 +46,11 @@ interface requestUser {
 
 const error = "error"
 const success = "success"
+const source = "balance"
 const type = {
     WELCOME: "welcome",
     TRANSFER: "transfer",
+    DEBIT: "debit",
     FUND: "fund",
     AJO: "ajo",
     PASSWORD_RESET: "password_reset"
@@ -57,6 +59,7 @@ const type = {
 export {
     error,
     success,
+    source,
     userData,
     getUserIp,
     connectToTestDB,
@@ -66,5 +69,6 @@ export {
     requestUser,
     closeDBConnection,
     regData,
-    type
+    type,
+    signInTestUser
 }

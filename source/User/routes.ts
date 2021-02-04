@@ -6,6 +6,7 @@ import {
     resetPassword,
     updatePassword,
     updateProfilePhoto,
+    updateAccountDetails,
     getUser,
     addBVN,
     confirmBVN
@@ -20,6 +21,7 @@ router.delete("/", deleteAllUser)
 router.post("/activate", auth, activateUser)
 router.post("/bvn", auth, addBVN)
 router.put("/photo", auth, updateProfilePhoto)
+router.put("/account", auth, updateAccountDetails)
 router.post("/bvn/confirm", auth, confirmBVN)
 router.post("/password/reset", auth, resetPassword)
 router.post("/password/update", auth, updatePassword)

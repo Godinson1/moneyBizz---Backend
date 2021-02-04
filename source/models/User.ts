@@ -58,6 +58,15 @@ const UserSchema = new Schema(
         bvn: {
             type: String
         },
+        accountNumber: {
+            type: String
+        },
+        bank: {
+            type: String
+        },
+        bankCode: {
+            type: String
+        },
         bvnOtp: {
             type: Number
         },
