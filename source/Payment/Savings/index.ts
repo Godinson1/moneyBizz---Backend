@@ -1,5 +1,11 @@
 import { ajo, activateAjo, retrieveAjo, addAjoMember } from "./Ajo/controller"
-import { fundAccountWithBankAccount, fundAccountWithCard, debitAccount, autoFundAcoount } from "./FundWallet/controller"
+import {
+    fundAccountWithBankAccount,
+    fundAccountWithExistingCard,
+    fundAccountWithCard,
+    debitAccount,
+    autoFundAcoount
+} from "./FundWallet/controller"
 import { resolveAccount, resolveBanks, createTransaction, transferFund, createRecipient } from "./FundWallet/helpers"
 import {
     addMember,
@@ -14,6 +20,7 @@ import {
 export {
     ajo,
     fundAccountWithBankAccount,
+    fundAccountWithExistingCard,
     fundAccountWithCard,
     createNotification,
     createTransaction,

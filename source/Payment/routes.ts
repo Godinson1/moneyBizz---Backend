@@ -3,6 +3,7 @@ import { confirmOtp, webhook, checkBalance } from "./controller"
 import {
     fundAccountWithBankAccount,
     fundAccountWithCard,
+    fundAccountWithExistingCard,
     debitAccount,
     autoFundAcoount,
     ajo,
@@ -15,6 +16,7 @@ import { singleTransfer, bulkTransfer } from "./Transfer"
 
 const router = express.Router()
 
+router.post("/fund", auth, fundAccountWithExistingCard)
 router.post("/fund/bank", auth, fundAccountWithBankAccount)
 router.post("/fund/card", auth, fundAccountWithCard)
 router.post("/auto-fund", auth, autoFundAcoount)

@@ -4,6 +4,7 @@ import { User } from "../../../models"
 import {
     CHARGE_URL,
     INITIALIZE_TRANSACTION,
+    CHARGE_AUTHORIZATION,
     CREATE_RECIPIENT,
     PLAN,
     SUBSCRIPTION,
@@ -15,7 +16,7 @@ import { isEmpty } from "../../../validations"
 import { transferFund, createRecipient } from "../../Savings"
 import { createTransaction } from "../index"
 
-const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
+const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND } = StatusCodes
 
 /**
  * Route for funding user wallet with bank account (Personal Saving)
@@ -42,7 +43,7 @@ const fundAccountWithBankAccount = async (req: Request, res: Response): Promise<
     try {
         try {
             userData = await User.findOne({ _id: req.user.id })
-            if (!userData) return handleResponse(res, error, BAD_REQUEST, "You can't carry out this operation..")
+            if (!userData) return handleResponse(res, error, NOT_FOUND, "You can't carry out this operation..")
 
             const chargeResponse = await makeRequest(CHARGE_URL, data)
             if (chargeResponse) {
@@ -81,7 +82,7 @@ const fundAccountWithCard = async (req: Request, res: Response): Promise<Respons
     try {
         try {
             userData = await User.findOne({ _id: req.user.id })
-            if (!userData) return handleResponse(res, error, BAD_REQUEST, "You can't carry out this operation..")
+            if (!userData) return handleResponse(res, error, NOT_FOUND, "You can't carry out this operation..")
 
             const chargeResponse = await makeRequest(INITIALIZE_TRANSACTION, data)
             if (chargeResponse) {
@@ -93,6 +94,56 @@ const fundAccountWithCard = async (req: Request, res: Response): Promise<Respons
                 data: chargeResponse.data
             })
         } catch (err) {
+            return handleResponse(res, error, BAD_REQUEST, err.response.data.message)
+        }
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
+    }
+}
+
+/**
+ * Route for funding user wallet with existing card (Personal Saving)
+ * Request - POST
+ * Validate request and attempt transaction
+ */
+const fundAccountWithExistingCard = async (req: Request, res: Response): Promise<Response | void> => {
+    let userData
+    const { amount } = req.body
+
+    if (isEmpty(amount)) return handleResponse(res, error, BAD_REQUEST, "Amount must not be empty..")
+
+    try {
+        try {
+            userData = await User.findOne({ _id: req.user.id })
+            if (!userData) return handleResponse(res, error, NOT_FOUND, "You can't carry out this operation..")
+
+            if (userData.hasOwnProperty("authorization") && Object.keys(userData).length !== 0) {
+                const params = JSON.stringify({
+                    email: req.user.email,
+                    amount,
+                    authorization_code: userData.authorization.authorization_code
+                })
+
+                const chargeResponse = await makeRequest(CHARGE_AUTHORIZATION, params)
+                if (chargeResponse.data.status) {
+                    await createTransaction(userData, req, amount, chargeResponse.data.data.reference, type.FUND)
+                    return res.status(OK).json({
+                        status: success,
+                        message: "Payment attempted successfully",
+                        data: chargeResponse.data
+                    })
+                }
+            } else {
+                return handleResponse(
+                    res,
+                    error,
+                    NOT_FOUND,
+                    "Authorization not found. Kindly initiate a transaction to get one."
+                )
+            }
+        } catch (err) {
+            console.log(err)
             return handleResponse(res, error, BAD_REQUEST, err.response.data.message)
         }
     } catch (err) {
@@ -117,7 +168,7 @@ const debitAccount = async (req: Request, res: Response): Promise<Response | voi
     try {
         //Check for valid authenticated user
         userData = await User.findOne({ _id: req.user.id })
-        if (!userData) return handleResponse(res, error, BAD_REQUEST, "You can't carry out this operation..")
+        if (!userData) return handleResponse(res, error, NOT_FOUND, "You can't carry out this operation..")
 
         //Check for sufficient balance
         if (amount > userData.available_balance)
@@ -208,4 +259,4 @@ const autoFundAcoount = async (req: Request, res: Response): Promise<Response | 
     }
 }
 
-export { fundAccountWithBankAccount, debitAccount, autoFundAcoount, fundAccountWithCard }
+export { fundAccountWithBankAccount, debitAccount, autoFundAcoount, fundAccountWithExistingCard, fundAccountWithCard }

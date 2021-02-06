@@ -131,21 +131,21 @@ const addBVN = async (req: Request, res: Response): Promise<Response> => {
                 const data = await makeGetRequest(`${BVN}/${bvn}`)
                 const response = data.data
                 if (response.status === true) {
+                    //Using or "" because I ain't checking for all user's bvn yet
                     userData = await User.findOne({ handle: req.user.handle })
                     const userInfo = response.data
-                    console.log(userInfo.enrollment_bank)
-                    userData.dateOfBirth = userInfo.formatted_dob
-                    userData.phone = userInfo.mobile
-                    userData.phoneTwo = userInfo.mobile2
-                    userData.bank = userInfo.enrollment_bank.name
-                    userData.bankCode = userInfo.enrollment_bank.code
-                    userData.bvn = userInfo.bvn
-                    userData.bvnBlacklisted = userInfo.is_blacklisted
-                    userData.sex = userInfo.gender
-                    userData.address = userInfo.residential_address
-                    userData.lgaOfAddress = userInfo.lga_of_residence
-                    userData.stateOfOrigin = userInfo.state_of_origin
-                    userData.lgaStateOfOrigin = userInfo.lga_of_origin
+                    userData.dateOfBirth = userInfo.formatted_dob || ""
+                    userData.phone = userInfo.mobile || ""
+                    userData.phoneTwo = userInfo.mobile2 || ""
+                    userData.bank = userInfo.enrollment_bank.name || ""
+                    userData.bankCode = userInfo.enrollment_bank.code || ""
+                    userData.bvn = userInfo.bvn || ""
+                    userData.bvnBlacklisted = userInfo.is_blacklisted || ""
+                    userData.sex = userInfo.gender || ""
+                    userData.address = userInfo.residential_address || ""
+                    userData.lgaOfAddress = userInfo.lga_of_residence || ""
+                    userData.stateOfOrigin = userInfo.state_of_origin || ""
+                    userData.lgaStateOfOrigin = userInfo.lga_of_origin || ""
                     userData.bvnOtp = uniqueCode()
                     const updatedUserData = await userData.save()
                     await sendMobileOTP(updatedUserData.bvnOtp, validatePhone(updatedUserData.phoneTwo))

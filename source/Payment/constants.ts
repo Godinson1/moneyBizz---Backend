@@ -11,6 +11,7 @@ const BANK = "https://api.paystack.co/bank"
 const PLAN = "https://api.paystack.co/plan"
 const SUBSCRIPTION = "https://api.paystack.co/subscription"
 const INITIALIZE_TRANSACTION = "https://api.paystack.co/transaction/initialize"
+const CHARGE_AUTHORIZATION = "https://api.paystack.co/transaction/charge_authorization"
 
 export {
     CHARGE_URL,
@@ -19,6 +20,7 @@ export {
     BVN,
     PLAN,
     SUBSCRIPTION,
+    CHARGE_AUTHORIZATION,
     INITIALIZE_TRANSACTION,
     RESOLVE_ACCOUNT,
     BULK_RECIPIENT,

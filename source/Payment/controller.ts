@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction, Transfer } from "../models"
-import { OTP_URL, BALANCE, validateIP, validateAmount, makeGetRequest, makeRequest } from "./index"
+import { OTP_URL, BALANCE, validateIP, checkIp, validateAmount, makeGetRequest, makeRequest } from "./index"
 import { handleResponse, success, error, type } from "../Utility"
 import { sendTransactionMail } from "../Authentication"
 import { createNotification } from "./Savings"
@@ -70,19 +70,8 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
     try {
         //@ - Todo
         //Whitelist only requests from paystack
-        //Validate amount
         //Create utility functions for different transaction types
         //--------------------------------------------------------
-        /*
-         *For bulk transfer, check the response returned first
-         *I can create an array field in users model that holds
-         *references of bulk transfers just like I did with the reference field
-         *for single transfer. Then map through and check each reference against that
-         *of the response returned from the webhook.
-         *Add total amount and store in debit, make calculation and debit user (initiator)
-         *Then send user(initiator) transaction mail of total amount sent to handle
-         *Send notification to user(initiator) and bizzers(beneficiaries or recipients)
-         */
         //--------------------------------------------------------
 
         const hash = validateIP(req.body)
@@ -90,6 +79,13 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             console.log(true)
         } else {
             console.log(false)
+        }
+
+        const isValidIP = checkIp(req.body.data.ip_address)
+        if (isValidIP) {
+            console.log("From paystack")
+        } else {
+            console.log("Not from paystack")
         }
 
         const chargeResponse = req.body

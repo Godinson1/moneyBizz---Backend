@@ -63,6 +63,7 @@ const createTransaction = async (
     userData.ref = ref
     await userData.save()
     await newTransaction.save()
+    console.log("Transaction created")
 }
 
 export { resolveAccount, resolveBanks, createRecipient, transferFund, createTransaction }

@@ -11,6 +11,12 @@ const validateIP = (data: string): string => {
     return hash
 }
 
+const checkIp = (ip: string): boolean => {
+    const acceptedIP = ["52.31.139.75", "52.49.173.169", "52.214.14.220"]
+    if (acceptedIP.includes(ip)) return true
+    else return false
+}
+
 const makeRequest = async (url: string, data: string): Promise<AxiosResponse> => {
     const chargeResponse = await axios.post(url, data, {
         headers: {
@@ -31,4 +37,4 @@ const makeGetRequest = async (url: string): Promise<AxiosResponse> => {
     return data
 }
 
-export { validateAmount, validateIP, makeRequest, makeGetRequest }
+export { validateAmount, validateIP, makeRequest, makeGetRequest, checkIp }
