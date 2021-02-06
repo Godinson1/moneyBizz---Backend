@@ -70,6 +70,18 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         //Whitelist only requests from paystack
         //Validate amount
         //Create utility functions for different transaction types
+        //--------------------------------------------------------
+        /*
+         *For bulk transfer, check the response returned first
+         *I can create an array field in users model that holds
+         *references of bulk transfers just like I did with the reference field
+         *for single transfer. Then map through and check each reference against that
+         *of the response returned from the webhook.
+         *Add total amount and store in debit, make calculation and debit user (initiator)
+         *Then send user(initiator) transaction mail of total amount sent to handle
+         *Send notification to user(initiator) and bizzers(beneficiaries or recipients)
+         */
+        //--------------------------------------------------------
 
         const hash = validateIP(req.body)
         if (hash == req.headers["x-paystack-signature"]) {
@@ -79,8 +91,6 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         }
 
         const chargeResponse = req.body
-        console.log(chargeResponse.data.reference)
-        console.log(chargeResponse)
         userData = await User.findOne({ ref: chargeResponse.data.reference })
         transactionData = await Transaction.findOne({ ref: userData.ref })
 
@@ -91,6 +101,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             const balance = userData.total_credit - userData.total_debit
             userData.total_balance = balance
             userData.available_balance = balance
+            userData.authorization = chargeResponse.data.authorization
             await userData.save()
             await sendTransactionMail(
                 type.FUND,

@@ -34,4 +34,11 @@ interface ResData {
     reason: string
 }
 
-export { bizzMember, RecipientsData, ResData }
+interface TransferRes {
+    recipient: string
+    amount: number
+    transfer_code: string
+    currency: string
+}
+
+export { bizzMember, RecipientsData, ResData, TransferRes }

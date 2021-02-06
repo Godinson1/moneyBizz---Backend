@@ -7,8 +7,11 @@ import {
     BULK_TRANSFER,
     BANK,
     BULK_RECIPIENT,
+    SUBSCRIPTION,
     CREATE_RECIPIENT,
-    RESOLVE_ACCOUNT
+    RESOLVE_ACCOUNT,
+    PLAN,
+    INITIALIZE_TRANSACTION
 } from "./constants"
 import { router } from "./routes"
 import { validateAmount, validateIP, makeRequest, makeGetRequest } from "./helpers"
@@ -18,7 +21,10 @@ import { findUserByHandle, findAllByHandle } from "./Savings"
 export {
     CHARGE_URL,
     OTP_URL,
+    SUBSCRIPTION,
     BALANCE,
+    INITIALIZE_TRANSACTION,
+    PLAN,
     BANK,
     BULK_RECIPIENT,
     TRANSFER,

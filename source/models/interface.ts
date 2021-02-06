@@ -17,6 +17,7 @@ export interface IUser extends mongoose.Document {
     lgaStateOfOrigin: string
     mbCode: string
     active: boolean
+    authorization: IAuthorization
     bvn: string
     bvnOtp: number
     bvnConfirmed: boolean
@@ -104,4 +105,17 @@ export interface INotification extends mongoose.Document {
     read: boolean
     message: string
     type: string
+}
+
+export interface IAuthorization {
+    authorization_code: string
+    bin: string
+    last4: string
+    exp_month: string
+    exp_year: string
+    card_type: string
+    bank: string
+    country_code: string
+    brand: string
+    account_name: string
 }

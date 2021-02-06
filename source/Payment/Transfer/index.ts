@@ -1,6 +1,6 @@
 import { singleTransfer, bulkTransfer } from "./controller"
-import { bizzRecipients, createBizzersData } from "./helpers"
-import { bizzMember, RecipientsData, ResData } from "./interface"
+import { bizzRecipients, createBizzersData, createTransactionAndConnection } from "./helpers"
+import { bizzMember, RecipientsData, ResData, TransferRes } from "./interface"
 //Temporary recipients response
 import { recipientResponse } from "./data"
 
@@ -10,7 +10,9 @@ export {
     bizzMember,
     RecipientsData,
     recipientResponse,
+    createTransactionAndConnection,
     ResData,
+    TransferRes,
     bulkTransfer,
     bizzRecipients
 }

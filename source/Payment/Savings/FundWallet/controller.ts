@@ -1,19 +1,28 @@
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
-import { User, Transaction } from "../../../models"
-import { CHARGE_URL, CREATE_RECIPIENT, TRANSFER, makeRequest } from "../../index"
-import { getUserIp, handleResponse, success, error, source, type } from "../../../Utility"
+import { User } from "../../../models"
+import {
+    CHARGE_URL,
+    INITIALIZE_TRANSACTION,
+    CREATE_RECIPIENT,
+    PLAN,
+    SUBSCRIPTION,
+    TRANSFER,
+    makeRequest
+} from "../../index"
+import { handleResponse, success, error, source, type } from "../../../Utility"
 import { isEmpty } from "../../../validations"
 import { transferFund, createRecipient } from "../../Savings"
+import { createTransaction } from "../index"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
 
 /**
- * Route for funding user wallet (Personal Saving)
+ * Route for funding user wallet with bank account (Personal Saving)
  * Request - POST
  * Validate request and attempt transaction
  */
-const fundAccount = async (req: Request, res: Response): Promise<Response> => {
+const fundAccountWithBankAccount = async (req: Request, res: Response): Promise<Response> => {
     let userData
     const { amount, code, account_number } = req.body
 
@@ -36,34 +45,8 @@ const fundAccount = async (req: Request, res: Response): Promise<Response> => {
             if (!userData) return handleResponse(res, error, BAD_REQUEST, "You can't carry out this operation..")
 
             const chargeResponse = await makeRequest(CHARGE_URL, data)
-
             if (chargeResponse) {
-                const newTransaction = new Transaction({
-                    initiatorHandle: `${req.user.handle}`,
-                    initiator_phone: "",
-                    initiator_bankCode: code,
-                    initiator_bank: "",
-                    initiator_accountNumber: account_number,
-                    recipient: "self",
-                    recipient_bank: "self",
-                    recipient_accountNumber: "self",
-                    reason: "Top up wallet",
-                    amount,
-                    ref: chargeResponse.data.data.reference,
-                    deviceIp: getUserIp(req),
-                    deviceInfo: {
-                        device: req.device,
-                        userAgent: req.useragent
-                    },
-                    executedAt: Date.now(),
-                    createdAt: Date.now(),
-                    executed: false,
-                    status: "in-process",
-                    type: type.FUND
-                })
-                userData.ref = chargeResponse.data.data.reference
-                await userData.save()
-                await newTransaction.save()
+                await createTransaction(userData, req, amount, chargeResponse.data.data.reference, type.FUND)
             }
             return res.status(OK).json({
                 status: success,
@@ -71,8 +54,46 @@ const fundAccount = async (req: Request, res: Response): Promise<Response> => {
                 data: chargeResponse.data
             })
         } catch (err) {
-            console.log(err)
-            return handleResponse(res, error, BAD_REQUEST, "Paystack: An error occured..")
+            return handleResponse(res, error, BAD_REQUEST, err.response.data.message)
+        }
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
+    }
+}
+
+/**
+ * Route for funding user wallet with card (Personal Saving)
+ * Request - POST
+ * Validate request and attempt transaction
+ */
+const fundAccountWithCard = async (req: Request, res: Response): Promise<Response> => {
+    let userData
+    const { amount } = req.body
+
+    if (isEmpty(amount)) return handleResponse(res, error, BAD_REQUEST, "Amount must not be empty..")
+
+    const data = JSON.stringify({
+        email: req.user.email,
+        amount
+    })
+
+    try {
+        try {
+            userData = await User.findOne({ _id: req.user.id })
+            if (!userData) return handleResponse(res, error, BAD_REQUEST, "You can't carry out this operation..")
+
+            const chargeResponse = await makeRequest(INITIALIZE_TRANSACTION, data)
+            if (chargeResponse) {
+                await createTransaction(userData, req, amount, chargeResponse.data.data.reference, type.FUND)
+            }
+            return res.status(OK).json({
+                status: success,
+                message: "Payment attempted successfully",
+                data: chargeResponse.data
+            })
+        } catch (err) {
+            return handleResponse(res, error, BAD_REQUEST, err.response.data.message)
         }
     } catch (err) {
         console.log(err)
@@ -131,32 +152,14 @@ const debitAccount = async (req: Request, res: Response): Promise<Response | voi
                 const transferRes = await transferFund(TRANSFER, transferParams)
                 //Initiate transaction
                 if (transferRes.status) {
-                    const newTransaction = new Transaction({
-                        initiatorHandle: `${req.user.handle}`,
-                        initiator_phone: userData.phone,
-                        initiator_bankCode: code,
-                        initiator_bank: "",
-                        initiator_accountNumber: account_number,
-                        recipient: "self",
-                        recipient_bank: "self",
-                        recipient_accountNumber: "self",
-                        reason: transferRes.data.reason,
-                        amount: transferRes.data.amount.toString(),
-                        ref: transferRes.data.transfer_code,
-                        deviceIp: getUserIp(req),
-                        deviceInfo: {
-                            device: req.device,
-                            userAgent: req.useragent
-                        },
-                        executedAt: Date.now(),
-                        createdAt: Date.now(),
-                        executed: false,
-                        status: "in-process",
-                        type: type.DEBIT
-                    })
-                    userData.ref = transferRes.data.transfer_code
-                    await userData.save()
-                    await newTransaction.save()
+                    await createTransaction(
+                        userData,
+                        req,
+                        amount.toString(),
+                        transferRes.data.transfer_code,
+                        type.TRANSFER,
+                        transferRes.data.reason
+                    )
                 }
 
                 return handleResponse(res, success, OK, "Bizz wallet debited successfully")
@@ -170,4 +173,39 @@ const debitAccount = async (req: Request, res: Response): Promise<Response | voi
     }
 }
 
-export { fundAccount, debitAccount }
+/**
+ * @Description - Route for debiting user wallet (Personal Saving)
+ * Request - POST
+ * Validate request and debit user account
+ */
+const autoFundAcoount = async (req: Request, res: Response): Promise<Response | void> => {
+    const { amount, interval, name, invoice_limit } = req.body
+
+    //Check for empty field
+    if (isEmpty(amount.toString()) || isEmpty(name) || isEmpty(interval))
+        return handleResponse(res, error, BAD_REQUEST, "Please provide all required fields")
+
+    const params = JSON.stringify({
+        name,
+        interval,
+        amount,
+        invoice_limit
+    })
+
+    try {
+        const planResponse = await makeRequest(PLAN, params)
+        const InitializeParams = JSON.stringify({
+            customer: req.user.email,
+            plan: planResponse.data.data.plan_code
+        })
+
+        const initializeResponse = await makeRequest(SUBSCRIPTION, InitializeParams)
+
+        return handleResponse(res, success, OK, initializeResponse.data.data)
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
+    }
+}
+
+export { fundAccountWithBankAccount, debitAccount, autoFundAcoount, fundAccountWithCard }

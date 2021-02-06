@@ -5,7 +5,7 @@ import { CREATE_RECIPIENT, BULK_RECIPIENT, TRANSFER, BULK_TRANSFER } from "../in
 import { getUserIp, handleResponse, success, error, source, type } from "../../Utility"
 import { isEmpty } from "../../validations"
 import { transferFund, createRecipient, findUserByHandle } from "../Savings"
-import { bizzRecipients, recipientResponse, createBizzersData } from "./index"
+import { bizzRecipients, createTransactionAndConnection, createBizzersData } from "./index"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND } = StatusCodes
 
@@ -148,7 +148,7 @@ const bulkTransfer = async (req: Request, res: Response): Promise<Response | voi
             if (!userData) return handleResponse(res, error, BAD_REQUEST, "You can't carry out this operation..")
 
             //Check for sufficient balance
-            if (amount > userData.available_balance)
+            if (amount * bizzers.lenghth > userData.available_balance)
                 return handleResponse(
                     res,
                     error,
@@ -169,7 +169,7 @@ const bulkTransfer = async (req: Request, res: Response): Promise<Response | voi
                 //Create helper function to send transfer data
 
                 const bizzersData = createBizzersData(recipient.data.success, amount, reason)
-                console.log(bizzersData)
+
                 //Check if recipient status is true
                 if (recipient.status) {
                     //Create transfer params
@@ -179,9 +179,9 @@ const bulkTransfer = async (req: Request, res: Response): Promise<Response | voi
                         transfers: bizzersData
                     })
                     const transferRes = await transferFund(BULK_TRANSFER, transferParams)
-                    //Initiate transaction
-                    //Map through each bizzer to create each transaction
                     if (transferRes.status) {
+                        //Create transaction and connection if not exist for each of the bizzers
+                        await createTransactionAndConnection(transferRes.data, userData, reason, req, data)
                         return handleResponse(
                             res,
                             success,

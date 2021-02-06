@@ -26,7 +26,7 @@ describe("Test for Funding wallet", () => {
             code: "057",
             account_number: "0000000000"
         }
-        const res = await request.post("/pay/fund").send(data).set("mb-token", token)
+        const res = await request.post("/pay/fund/bank").send(data).set("mb-token", token)
         expect(res.status).toEqual(OK)
         expect(res.body).toHaveProperty("data")
         expect(res.body).toHaveProperty("status")
@@ -41,7 +41,7 @@ describe("Test for Funding wallet", () => {
             code: "",
             account_number: "0000000000"
         }
-        const res = await request.post("/pay/fund").send(data).set("mb-token", token)
+        const res = await request.post("/pay/fund/bank").send(data).set("mb-token", token)
         expect(res.status).toEqual(BAD_REQUEST)
         expect(res.body).toHaveProperty("status")
         expect(res.body).toHaveProperty("message")
@@ -58,14 +58,16 @@ describe("Test for Debiting wallet", () => {
         const data = {
             amount: 50000,
             code: "050",
-            account_number: "4231081921"
+            account_number: "0000000000"
         }
         const res = await request.post("/pay/debit").send(data).set("mb-token", token)
         expect(res.status).toEqual(BAD_REQUEST)
         expect(res.body).toHaveProperty("status")
         expect(res.body).toHaveProperty("message")
         expect(res.body.status).toEqual(error)
-        expect(res.body.message).toEqual("You cannot initiate third party payouts as a starter business")
+        expect(res.body.message).toEqual(
+            "Insufficient Fund: Kindly top up your bizz wallet to carry out this transaction"
+        )
     }, 20000)
 
     it("should fail for any empty field", async () => {
@@ -74,7 +76,7 @@ describe("Test for Debiting wallet", () => {
             code: "",
             account_number: "0000000000"
         }
-        const res = await request.post("/pay/fund").send(data).set("mb-token", token)
+        const res = await request.post("/pay/debit").send(data).set("mb-token", token)
         expect(res.status).toEqual(BAD_REQUEST)
         expect(res.body).toHaveProperty("status")
         expect(res.body).toHaveProperty("message")
@@ -85,10 +87,10 @@ describe("Test for Debiting wallet", () => {
     it("should fail for insufficient fund from wallet", async () => {
         const data = {
             amount: 5000000000,
-            code: "",
+            code: "057",
             account_number: "0000000000"
         }
-        const res = await request.post("/pay/fund").send(data).set("mb-token", token)
+        const res = await request.post("/pay/debit").send(data).set("mb-token", token)
         expect(res.status).toEqual(BAD_REQUEST)
         expect(res.body).toHaveProperty("status")
         expect(res.body).toHaveProperty("message")

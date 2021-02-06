@@ -58,6 +58,9 @@ const UserSchema = new Schema(
         bvn: {
             type: String
         },
+        authorization: {
+            type: Object
+        },
         accountNumber: {
             type: String
         },
