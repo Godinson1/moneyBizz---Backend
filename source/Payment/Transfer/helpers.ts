@@ -95,4 +95,35 @@ const createTransactionAndConnection = async (
     return "Transactions created successfully"
 }
 
-export { bizzRecipients, createBizzersData, createTransactionAndConnection }
+const createTransfer = async (user: IUser, bizzerData: IUser, code: string): Promise<void> => {
+    const newTransfer = new Connection({
+        connectorID: user.id,
+        connectorHandle: user.handle,
+        connectee_accountNumber: bizzerData.accountNumber,
+        connectee_bank: bizzerData.bankCode,
+        transferCode: code,
+        executed: false,
+        connecteeHandle: bizzerData.handle
+    })
+    await newTransfer.save()
+
+    //Check if connection has been established
+    const connectionExist = Connection.findOne({
+        $and: [{ connecteeHandle: { $eq: bizzerData.handle } }, { connectorHandle: { $eq: user.handle } }]
+    })
+
+    //If no connection has been established, create one!
+    if (!connectionExist) {
+        const newConnection = new Connection({
+            connectorID: user.id,
+            connectorHandle: user.handle,
+            connectee_accountNumber: bizzerData.accountNumber,
+            connectee_bank: bizzerData.bankCode,
+            connectee_profilePhoto: bizzerData.profile_photo,
+            connecteeHandle: bizzerData.handle
+        })
+        await newConnection.save()
+    }
+}
+
+export { bizzRecipients, createBizzersData, createTransfer, createTransactionAndConnection }

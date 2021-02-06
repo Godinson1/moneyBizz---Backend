@@ -1,11 +1,11 @@
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
-import { User, Transaction, Connection } from "../../models"
+import { User } from "../../models"
 import { CREATE_RECIPIENT, BULK_RECIPIENT, TRANSFER, BULK_TRANSFER } from "../index"
-import { getUserIp, handleResponse, success, error, source, type } from "../../Utility"
+import { handleResponse, success, error, source, type } from "../../Utility"
 import { isEmpty } from "../../validations"
-import { transferFund, createRecipient, findUserByHandle } from "../Savings"
-import { bizzRecipients, createTransactionAndConnection, createBizzersData } from "./index"
+import { transferFund, createRecipient, findUserByHandle, createTransaction } from "../Savings"
+import { bizzRecipients, createTransactionAndConnection, createTransfer, createBizzersData } from "./index"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND } = StatusCodes
 
@@ -65,58 +65,17 @@ const singleTransfer = async (req: Request, res: Response): Promise<Response | v
                 const transferRes = await transferFund(TRANSFER, transferParams)
                 //Initiate transaction
                 if (transferRes.status) {
-                    const newTransaction = new Transaction({
-                        initiatorHandle: `${req.user.handle}`,
-                        initiator_phone: userData.phone,
-                        initiator_bankCode: userData.bankCode,
-                        initiator_bank: "",
-                        initiator_accountNumber: userData.accountNumber,
-                        recipient: bizzerData.handle,
-                        recipient_bank: bizzerData.bank,
-                        recipient_accountNumber: bizzerData.accountNumber,
-                        reason: transferRes.data.reason,
-                        amount: transferRes.data.amount.toString(),
-                        ref: transferRes.data.transfer_code,
-                        deviceIp: getUserIp(req),
-                        deviceInfo: {
-                            device: req.device,
-                            userAgent: req.useragent
-                        },
-                        executedAt: Date.now(),
-                        createdAt: Date.now(),
-                        executed: false,
-                        status: "in-process",
-                        type: type.TRANSFER
-                    })
-
-                    //Check if connection has been established
-                    const connectionExist = Connection.findOne({
-                        $and: [
-                            { connecteeHandle: { $eq: bizzerData.handle } },
-                            { connectorHandle: { $eq: userData.handle } }
-                        ]
-                    })
-
-                    //If no connection has been established, create one!
-                    if (!connectionExist) {
-                        const newConnection = new Connection({
-                            connectorID: userData.id,
-                            connectorHandle: userData.handle,
-                            connectee_accountNumber: bizzerData.accountNumber,
-                            connectee_bank: bizzerData.bankCode,
-                            connectee_profilePhoto: bizzerData.profile_photo,
-                            connecteeHandle: bizzerData.handle
-                        })
-                        await newConnection.save()
-                    }
-
-                    //Save transaction reference and save
-                    userData.ref = transferRes.data.transfer_code
-                    await userData.save()
-                    await newTransaction.save()
+                    await createTransaction(
+                        userData,
+                        req,
+                        amount,
+                        transferRes.data.transfer_code,
+                        type.TRANSFER,
+                        reason
+                    )
+                    await createTransfer(userData, bizzerData, transferRes.data.transfer_code)
+                    return handleResponse(res, success, OK, `You successfully sent money to ${bizzerData.handle}`)
                 }
-
-                return handleResponse(res, success, OK, `You successfully sent money to ${bizzerData.handle}`)
             }
         } catch (err) {
             return handleResponse(res, error, BAD_REQUEST, err.response.data.message)

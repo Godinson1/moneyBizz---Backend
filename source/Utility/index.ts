@@ -47,6 +47,7 @@ interface requestUser {
 const error = "error"
 const success = "success"
 const source = "balance"
+const GMAIL = "gmail"
 const type = {
     WELCOME: "welcome",
     TRANSFER: "transfer",
@@ -70,5 +71,6 @@ export {
     closeDBConnection,
     regData,
     type,
+    GMAIL,
     signInTestUser
 }

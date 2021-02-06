@@ -12,8 +12,14 @@ const fundWalletHeader = (firstName: string, amount: string, reference: string):
     )} has been added to your bizz wallet - [${reference}]`
 }
 
+const debitWalletHeader = (firstName: string, amount: string, reference: string): string => {
+    return `${firstName}, ${formatter.format(
+        validateAmount(amount)
+    )} has been debited from your bizz wallet - [${reference}]`
+}
+
 const welcomeBody = (code: string, firstName: string): string => {
-    return `<h2>&#9995; Hi ${firstName}</h2> 
+    return `<h2>Hi ${firstName} &#128075;</h2> 
     <p>Thank you for choosing to join the FORCE as a MoneyBizzer.<br>
     <br>
     Your unique code is <b>${code}</b>
@@ -25,7 +31,7 @@ const welcomeBody = (code: string, firstName: string): string => {
 }
 
 const resetPasswordBody = (code: string, firstName: string): string => {
-    return `<h2>Hi ${firstName} &#9995;</h2> 
+    return `<h2>Hi ${firstName} &#128075;</h2> 
     <p>Someone has asked to reset the password for your account.<br>
     If you did not request a password reset, you can disregard this email.
     <br>
@@ -41,7 +47,7 @@ const resetPasswordBody = (code: string, firstName: string): string => {
 }
 
 const fundWalletBody = (firstName: string, amount: string, reference: string, date: string, reason: string): string => {
-    return `<h2>Hello ${firstName} &#9995;</h2> 
+    return `<h2>Hello ${firstName} &#128075;</h2> 
     <p>Your MoneyBizz bizz wallet has been credited successfully.<br>
     <br>
     <b>Transaction Details</b><br>
@@ -53,6 +59,31 @@ const fundWalletBody = (firstName: string, amount: string, reference: string, da
     Date: ${date}</p>
     <br><br>
     You are doing well &#128522;
+    <br><br>
+    <b>All the best!</b>
+    <br>
+    <b>Team MoneyBizz<b>`
+}
+
+const debitWalletBody = (
+    firstName: string,
+    amount: string,
+    reference: string,
+    date: string,
+    reason: string
+): string => {
+    return `<h2>Hello ${firstName} &#128075;</h2> 
+    <p>Your MoneyBizz bizz wallet has been debited successfully.<br>
+    <br>
+    <b>Transaction Details</b><br>
+    <br>Amount: <b style="color: red;">${formatter.format(validateAmount(amount))}</b>
+    <br>
+    Reason: ${reason}
+    <br><br>
+    Reference: ${reference}<br><br>
+    Date: ${date}</p>
+    <br><br>
+    Keep up the good work &#128170;;
     <br><br>
     <b>All the best!</b>
     <br>
@@ -78,10 +109,14 @@ const formatter = new Intl.NumberFormat("en-NG", {
 
 export {
     resetPasswordHeader,
+    debitWalletBody,
+    debitWalletHeader,
     validatePhone,
     welcomeHeader,
     fundWalletHeader,
+    validateAmount,
     welcomeBody,
     fundWalletBody,
-    resetPasswordBody
+    resetPasswordBody,
+    formatter
 }

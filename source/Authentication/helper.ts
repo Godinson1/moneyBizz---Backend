@@ -1,8 +1,15 @@
 import jwt from "jsonwebtoken"
 import { IUser } from "../models"
 import nodemailer from "nodemailer"
-import { type } from "../Utility"
-import { welcomeBody, welcomeHeader, fundWalletBody, fundWalletHeader } from "./index"
+import { type, GMAIL } from "../Utility"
+import {
+    welcomeBody,
+    welcomeHeader,
+    fundWalletBody,
+    fundWalletHeader,
+    debitWalletHeader,
+    debitWalletBody
+} from "./index"
 import { resetPasswordBody, resetPasswordHeader } from "./data"
 import client from "twilio"
 
@@ -25,7 +32,7 @@ const uniqueCode = (): number => {
 
 const sendAuthMail = (emailType: string, code: string, email: string, firstName: string): void => {
     const transporter = nodemailer.createTransport({
-        service: "gmail",
+        service: GMAIL,
         auth: {
             user: process.env.EMAIL,
             pass: process.env.PASSWORD
@@ -58,7 +65,7 @@ const sendTransactionMail = (
     date: string
 ): void => {
     const transporter = nodemailer.createTransport({
-        service: "gmail",
+        service: GMAIL,
         auth: {
             user: process.env.EMAIL,
             pass: process.env.PASSWORD
@@ -68,8 +75,14 @@ const sendTransactionMail = (
     const mailOptions = {
         from: process.env.EMAIL,
         to: email,
-        subject: emailType === type.FUND ? fundWalletHeader(firstName, amount, reference) : "In Progress",
-        html: emailType === type.FUND ? fundWalletBody(firstName, amount, reference, date, reason) : "In Progress"
+        subject:
+            emailType === type.FUND
+                ? fundWalletHeader(firstName, amount, reference)
+                : debitWalletHeader(firstName, amount, reference),
+        html:
+            emailType === type.FUND
+                ? fundWalletBody(firstName, amount, reference, date, reason)
+                : debitWalletBody(firstName, amount, reference, date, reason)
     }
 
     transporter.sendMail(mailOptions, (error, info) => {

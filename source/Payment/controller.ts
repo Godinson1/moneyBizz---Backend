@@ -1,9 +1,10 @@
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
-import { User, Transaction } from "../models"
+import { User, Transaction, Transfer } from "../models"
 import { OTP_URL, BALANCE, validateIP, validateAmount, makeGetRequest, makeRequest } from "./index"
 import { handleResponse, success, error, type } from "../Utility"
 import { sendTransactionMail } from "../Authentication"
+import { createNotification } from "./Savings"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
 
@@ -64,6 +65,7 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
 const webhook = async (req: Request, res: Response): Promise<Response> => {
     let userData
     let transactionData
+    let transferData
 
     try {
         //@ - Todo
@@ -93,6 +95,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         const chargeResponse = req.body
         userData = await User.findOne({ ref: chargeResponse.data.reference })
         transactionData = await Transaction.findOne({ ref: userData.ref })
+        transferData = await Transfer.findOne({ transferCode: chargeResponse.data.transfer_code })
 
         const amount = validateAmount(chargeResponse.data.amount)
 
@@ -128,6 +131,16 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
                 chargeResponse.data.transfer_code,
                 transactionData.reason,
                 chargeResponse.data.created_at
+            )
+            await createNotification(
+                userData.handle,
+                type.TRANSFER,
+                userData.handle,
+                transferData.recipientHandle,
+                userData.firstName,
+                transferData.id,
+                chargeResponse.data.reference,
+                amount
             )
         }
 

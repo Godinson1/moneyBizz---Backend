@@ -71,6 +71,17 @@ export interface IConnection extends mongoose.Document {
     connecteeHandle: string
 }
 
+export interface ITransfer extends mongoose.Document {
+    transferID: mongoose.Types.ObjectId
+    initiatorID: string
+    initiatorHandle: string
+    transferCode: string
+    recipient_accountNumber: number
+    recipient_bank: string
+    executed: boolean
+    recipientHandle: string
+}
+
 export interface IAjo extends mongoose.Document {
     ajoID: mongoose.Types.ObjectId
     createdBy: string
