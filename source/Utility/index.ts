@@ -35,6 +35,8 @@ const handleResponse = async (res: Response, status: string, code: number, messa
     })
 }
 
+//const autoCredit = () => {}
+
 interface requestUser {
     id: string
     handle: string
@@ -53,6 +55,7 @@ const type = {
     TRANSFER: "transfer",
     DEBIT: "debit",
     FUND: "fund",
+    REQUEST_FUND: "request_fund",
     AJO: "ajo",
     PASSWORD_RESET: "password_reset"
 }

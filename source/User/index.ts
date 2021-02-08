@@ -8,7 +8,8 @@ import {
     updateProfilePhoto,
     updateAccountDetails,
     addBVN,
-    confirmBVN
+    confirmBVN,
+    requestForFund
 } from "./controller"
 import { router } from "./routes"
 import { uploadImage } from "./helpers"
@@ -17,6 +18,7 @@ export {
     getAllUser,
     updateProfilePhoto,
     updateAccountDetails,
+    requestForFund,
     router,
     deleteAllUser,
     resetPassword,

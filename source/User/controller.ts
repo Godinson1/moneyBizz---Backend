@@ -9,6 +9,8 @@ import { bizzCode, uniqueCode, sendMobileOTP, validatePhone, sendAuthMail } from
 import bcrypt from "bcryptjs"
 import { uploadImage } from "./index"
 import { UploadedFile } from "express-fileupload"
+import { createNotification } from "../Payment/Savings"
+import cron from "node-cron"
 
 const { OK, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED, BAD_REQUEST } = StatusCodes
 
@@ -20,6 +22,10 @@ const { OK, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED, BAD_REQUEST } = Stat
 const getAllUser = async (req: Request, res: Response): Promise<Response> => {
     try {
         const data = await User.find({})
+        cron.schedule("* * * * *", async () => {
+            console.log("Testing User User")
+        })
+
         return res.status(OK).json({
             status: success,
             message: "Users data retrieved successfully",
@@ -332,6 +338,41 @@ const updateAccountDetails = async (req: Request, res: Response): Promise<Respon
     }
 }
 
+/*
+ * NAME - requestForFund
+ * @REQUEST METHOD - POST
+ * AIM - Request for funds from fellow bizzers
+ */
+const requestForFund = async (req: Request, res: Response): Promise<Response> => {
+    let userData
+    const { handle, message, amount } = req.body
+    if (!handle || !message || !amount)
+        return handleResponse(res, error, BAD_REQUEST, `Please fill all required fields`)
+    try {
+        userData = await findUserByHandle(handle)
+        if (userData) {
+            if (userData.handle === req.user.handle)
+                return handleResponse(res, error, BAD_REQUEST, `You can't request for Self Fund`)
+            await createNotification(
+                req.user.handle,
+                req.user.handle,
+                handle,
+                req.user.firstName,
+                "some-id",
+                message,
+                type.REQUEST_FUND,
+                amount
+            )
+            return handleResponse(res, success, OK, `You successfully requested for fund from @${handle}.`)
+        } else {
+            return handleResponse(res, error, NOT_FOUND, `User not found`)
+        }
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
+    }
+}
+
 export {
     getAllUser,
     deleteAllUser,
@@ -342,5 +383,6 @@ export {
     addBVN,
     confirmBVN,
     resetPassword,
+    requestForFund,
     updateAccountDetails
 }

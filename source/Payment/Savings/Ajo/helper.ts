@@ -160,7 +160,13 @@ const createNotification = async (
                   )} to your attached account`
                 : notificationType === type.AJO && sender === receiver
                 ? `You created AJo account!! Your Ajo Code is - ${code}.`
-                : `${senderFirstName} created Ajo account and added you.`
+                : notificationType === type.AJO && sender !== receiver
+                ? `${senderFirstName} created Ajo account and added you.`
+                : notificationType === type.REQUEST_FUND && sender === authHandle
+                ? `You requested the sum of ${formatter.format(validateAmount(amount.toString()))} from @${receiver}`
+                : `@${senderFirstName} - @${sender} has requested the sum of ${formatter.format(
+                      validateAmount(amount.toString())
+                  )} from you. "${code}"`
     })
     await notify.save()
 }

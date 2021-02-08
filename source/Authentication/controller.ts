@@ -46,6 +46,12 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
             bankCode: "",
             accountNumber: "",
             authorization: {},
+            autoSave: {
+                active: false,
+                interval: "",
+                amount: 0,
+                createdAt: ""
+            },
             bvn: "",
             bvnOtp: "",
             bvnConfirmed: false,

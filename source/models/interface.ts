@@ -18,6 +18,7 @@ export interface IUser extends mongoose.Document {
     mbCode: string
     active: boolean
     authorization: IAuthorization
+    autoSave: IAutosave
     bvn: string
     bvnOtp: number
     bvnConfirmed: boolean
@@ -129,4 +130,11 @@ export interface IAuthorization {
     country_code: string
     brand: string
     account_name: string
+}
+
+export interface IAutosave {
+    active: boolean
+    interval: string
+    createdAt: string
+    amount: number
 }

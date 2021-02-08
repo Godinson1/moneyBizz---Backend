@@ -6,8 +6,6 @@ import {
     INITIALIZE_TRANSACTION,
     CHARGE_AUTHORIZATION,
     CREATE_RECIPIENT,
-    PLAN,
-    SUBSCRIPTION,
     TRANSFER,
     makeRequest
 } from "../../index"
@@ -118,7 +116,7 @@ const fundAccountWithExistingCard = async (req: Request, res: Response): Promise
             userData = await User.findOne({ _id: req.user.id })
             if (!userData) return handleResponse(res, error, NOT_FOUND, "You can't carry out this operation..")
 
-            if (userData.hasOwnProperty("authorization") && Object.keys(userData).length !== 0) {
+            if (userData.authorization && Object.keys(userData.authorization).length !== 0) {
                 const params = JSON.stringify({
                     email: req.user.email,
                     amount,
@@ -230,29 +228,44 @@ const debitAccount = async (req: Request, res: Response): Promise<Response | voi
  * Validate request and debit user account
  */
 const autoFundAcoount = async (req: Request, res: Response): Promise<Response | void> => {
-    const { amount, interval, name, invoice_limit } = req.body
+    let userData
+    const { amount } = req.body
 
-    //Check for empty field
-    if (isEmpty(amount.toString()) || isEmpty(name) || isEmpty(interval))
-        return handleResponse(res, error, BAD_REQUEST, "Please provide all required fields")
-
-    const params = JSON.stringify({
-        name,
-        interval,
-        amount,
-        invoice_limit
-    })
+    if (isEmpty(amount)) return handleResponse(res, error, BAD_REQUEST, "Amount must not be empty..")
 
     try {
-        const planResponse = await makeRequest(PLAN, params)
-        const InitializeParams = JSON.stringify({
-            customer: req.user.email,
-            plan: planResponse.data.data.plan_code
-        })
+        try {
+            userData = await User.findOne({ _id: req.user.id })
+            if (!userData) return handleResponse(res, error, NOT_FOUND, "You can't carry out this operation..")
 
-        const initializeResponse = await makeRequest(SUBSCRIPTION, InitializeParams)
+            if (userData.authorization && Object.keys(userData.authorization).length !== 0) {
+                const params = JSON.stringify({
+                    email: req.user.email,
+                    amount,
+                    authorization_code: userData.authorization.authorization_code
+                })
 
-        return handleResponse(res, success, OK, initializeResponse.data.data)
+                const chargeResponse = await makeRequest(CHARGE_AUTHORIZATION, params)
+                if (chargeResponse.data.status) {
+                    await createTransaction(userData, req, amount, chargeResponse.data.data.reference, type.FUND)
+                    return res.status(OK).json({
+                        status: success,
+                        message: "Payment attempted successfully",
+                        data: chargeResponse.data
+                    })
+                }
+            } else {
+                return handleResponse(
+                    res,
+                    error,
+                    NOT_FOUND,
+                    "Authorization not found. Kindly initiate a transaction to get one."
+                )
+            }
+        } catch (err) {
+            console.log(err)
+            return handleResponse(res, error, BAD_REQUEST, err.response.data.message)
+        }
     } catch (err) {
         console.log(err)
         return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
