@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
-import { User } from "../../../models"
+import { IUser, User } from "../../../models"
 import {
     CHARGE_URL,
     INITIALIZE_TRANSACTION,
@@ -11,8 +11,9 @@ import {
 } from "../../index"
 import { handleResponse, success, error, source, type } from "../../../Utility"
 import { isEmpty } from "../../../validations"
-import { transferFund, createRecipient } from "../../Savings"
+import { transferFund, createRecipient, chargeUser } from "../../Savings"
 import { createTransaction } from "../index"
+import cron from "node-cron"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND } = StatusCodes
 
@@ -227,11 +228,11 @@ const debitAccount = async (req: Request, res: Response): Promise<Response | voi
  * Request - POST
  * Validate request and debit user account
  */
-const autoFundAcoount = async (req: Request, res: Response): Promise<Response | void> => {
-    let userData
-    const { amount } = req.body
+const autoFundAccount = async (req: Request, res: Response): Promise<Response | void> => {
+    let userData: IUser
+    const { interval, minute, hour, dayOfMonth, dayOfWeek, amount } = req.body
 
-    if (isEmpty(amount)) return handleResponse(res, error, BAD_REQUEST, "Amount must not be empty..")
+    if (isEmpty(amount.toString())) return handleResponse(res, error, BAD_REQUEST, "Amount must not be empty..")
 
     try {
         try {
@@ -239,20 +240,74 @@ const autoFundAcoount = async (req: Request, res: Response): Promise<Response | 
             if (!userData) return handleResponse(res, error, NOT_FOUND, "You can't carry out this operation..")
 
             if (userData.authorization && Object.keys(userData.authorization).length !== 0) {
-                const params = JSON.stringify({
-                    email: req.user.email,
-                    amount,
-                    authorization_code: userData.authorization.authorization_code
-                })
+                if (Object.keys(userData.autoSave).length === 0)
+                    return handleResponse(res, error, NOT_FOUND, "Please update your auto save setting.")
 
-                const chargeResponse = await makeRequest(CHARGE_AUTHORIZATION, params)
-                if (chargeResponse.data.status) {
-                    await createTransaction(userData, req, amount, chargeResponse.data.data.reference, type.FUND)
-                    return res.status(OK).json({
-                        status: success,
-                        message: "Payment attempted successfully",
-                        data: chargeResponse.data
+                const data = {
+                    interval,
+                    minute,
+                    hour,
+                    dayOfMonth,
+                    dayOfWeek,
+                    amount,
+                    active: true
+                }
+                userData.autoSave = data
+
+                if (interval === "daily") {
+                    cron.schedule(`${minute} ${hour} * * *`, async () => {
+                        console.log("Testing User User")
+                        const chargeResponse = await chargeUser(userData, req, amount)
+                        if (typeof chargeResponse === "string")
+                            return handleResponse(res, error, NOT_FOUND, chargeResponse)
+                        if (chargeResponse.data.status) {
+                            return res.status(OK).json({
+                                status: success,
+                                message: "Payment attempted successfully",
+                                data: chargeResponse.data
+                            })
+                        }
                     })
+                } else if (interval === "weekly") {
+                    cron.schedule(`${minute} ${hour} * * ${dayOfWeek}`, async () => {
+                        console.log("Testing User User")
+                        const chargeResponse = await chargeUser(userData, req, amount)
+                        if (typeof chargeResponse === "string")
+                            return handleResponse(res, error, NOT_FOUND, chargeResponse)
+                        if (chargeResponse.data.status) {
+                            return res.status(OK).json({
+                                status: success,
+                                message: "Payment attempted successfully",
+                                data: chargeResponse.data
+                            })
+                        }
+                    })
+                } else if (interval === "monthly") {
+                    cron.schedule(`${minute} ${hour} ${dayOfMonth} * *`, async () => {
+                        console.log("Testing User User")
+                    })
+                    const chargeResponse = await chargeUser(userData, req, amount)
+                    if (typeof chargeResponse === "string") return handleResponse(res, error, NOT_FOUND, chargeResponse)
+                    if (chargeResponse.data.status) {
+                        return res.status(OK).json({
+                            status: success,
+                            message: "Payment attempted successfully",
+                            data: chargeResponse.data
+                        })
+                    }
+                } else if (interval === "testing") {
+                    cron.schedule(`${minute} * * * *`, async () => {
+                        console.log("Testing User User")
+                    })
+                    const chargeResponse = await chargeUser(userData, req, amount)
+                    if (typeof chargeResponse === "string") return handleResponse(res, error, NOT_FOUND, chargeResponse)
+                    if (chargeResponse.data.status) {
+                        return res.status(OK).json({
+                            status: success,
+                            message: "Payment attempted successfully",
+                            data: chargeResponse.data
+                        })
+                    }
                 }
             } else {
                 return handleResponse(
@@ -272,4 +327,4 @@ const autoFundAcoount = async (req: Request, res: Response): Promise<Response | 
     }
 }
 
-export { fundAccountWithBankAccount, debitAccount, autoFundAcoount, fundAccountWithExistingCard, fundAccountWithCard }
+export { fundAccountWithBankAccount, debitAccount, autoFundAccount, fundAccountWithExistingCard, fundAccountWithCard }

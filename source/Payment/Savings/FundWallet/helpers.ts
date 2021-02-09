@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios"
-import { makeGetRequest, makeRequest, BANK } from "../../index"
+import { makeGetRequest, makeRequest, BANK, CHARGE_AUTHORIZATION } from "../../index"
 import { IUser, Transaction } from "../../../models"
 import { Request } from "express"
 import { type, getUserIp } from "../../../Utility"
@@ -66,4 +66,23 @@ const createTransaction = async (
     console.log("Transaction created")
 }
 
-export { resolveAccount, resolveBanks, createRecipient, transferFund, createTransaction }
+const chargeUser = async (userData: IUser, req: Request, amount: string): Promise<AxiosResponse> => {
+    try {
+        const params = JSON.stringify({
+            email: req.user.email,
+            amount,
+            authorization_code: userData.authorization.authorization_code
+        })
+
+        const chargeResponse = await makeRequest(CHARGE_AUTHORIZATION, params)
+        if (chargeResponse.data.status) {
+            await createTransaction(userData, req, amount.toString(), chargeResponse.data.data.reference, type.FUND)
+        }
+        return chargeResponse
+    } catch (err) {
+        console.log(err)
+        return err.response.data.message
+    }
+}
+
+export { resolveAccount, resolveBanks, createRecipient, transferFund, createTransaction, chargeUser }

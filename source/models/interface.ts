@@ -133,8 +133,11 @@ export interface IAuthorization {
 }
 
 export interface IAutosave {
-    active: boolean
     interval: string
-    createdAt: string
+    minute: number
+    hour: number
+    dayOfMonth: number
+    dayOfWeek: number
     amount: number
+    active: boolean
 }

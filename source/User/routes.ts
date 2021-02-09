@@ -10,6 +10,8 @@ import {
     getUser,
     requestForFund,
     addBVN,
+    autoSave,
+    switchAutoSave,
     confirmBVN
 } from "./index"
 import { auth } from "../Authentication"
@@ -27,5 +29,7 @@ router.put("/account", auth, updateAccountDetails)
 router.post("/request-fund", auth, requestForFund)
 router.post("/password/reset", auth, resetPassword)
 router.post("/password/update", auth, updatePassword)
+router.put("/autosave", auth, autoSave)
+router.put("/autosave/switch", auth, switchAutoSave)
 
 export { router }

@@ -10,7 +10,6 @@ import bcrypt from "bcryptjs"
 import { uploadImage } from "./index"
 import { UploadedFile } from "express-fileupload"
 import { createNotification } from "../Payment/Savings"
-import cron from "node-cron"
 
 const { OK, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED, BAD_REQUEST } = StatusCodes
 
@@ -22,10 +21,6 @@ const { OK, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED, BAD_REQUEST } = Stat
 const getAllUser = async (req: Request, res: Response): Promise<Response> => {
     try {
         const data = await User.find({})
-        cron.schedule("* * * * *", async () => {
-            console.log("Testing User User")
-        })
-
         return res.status(OK).json({
             status: success,
             message: "Users data retrieved successfully",
@@ -355,7 +350,6 @@ const requestForFund = async (req: Request, res: Response): Promise<Response> =>
                 return handleResponse(res, error, BAD_REQUEST, `You can't request for Self Fund`)
             await createNotification(
                 req.user.handle,
-                req.user.handle,
                 handle,
                 req.user.firstName,
                 "some-id",
@@ -366,6 +360,63 @@ const requestForFund = async (req: Request, res: Response): Promise<Response> =>
             return handleResponse(res, success, OK, `You successfully requested for fund from @${handle}.`)
         } else {
             return handleResponse(res, error, NOT_FOUND, `User not found`)
+        }
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
+    }
+}
+
+/*
+ * NAME - autoSave
+ * @REQUEST METHOD - PUT
+ * AIM - Update autosave setting
+ */
+const autoSave = async (req: Request, res: Response): Promise<Response> => {
+    let userData
+    const { interval, minute, hour, dayOfMonth, dayOfWeek, amount, active } = req.body
+
+    try {
+        userData = await findUserByHandle(req.user.handle)
+        if (userData) {
+            const data = {
+                active,
+                interval,
+                amount,
+                minute,
+                hour,
+                dayOfMonth,
+                dayOfWeek
+            }
+            userData.autoSave = data
+            await userData.save()
+            return handleResponse(res, success, OK, `Auto feature updated successfully..`)
+        } else {
+            return handleResponse(res, error, NOT_FOUND, `You can't carry out this operation.`)
+        }
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
+    }
+}
+
+/*
+ * NAME - autoSave
+ * @REQUEST METHOD - PUT
+ * AIM - Update autosave setting
+ */
+const switchAutoSave = async (req: Request, res: Response): Promise<Response> => {
+    let userData
+    const { active } = req.body
+
+    try {
+        userData = await findUserByHandle(req.user.handle)
+        if (userData) {
+            userData.autoSave.active = active
+            await userData.save()
+            return handleResponse(res, success, OK, `Auto feature updated successfully..`)
+        } else {
+            return handleResponse(res, error, NOT_FOUND, `You can't carry out this operation.`)
         }
     } catch (err) {
         console.log(err)
@@ -384,5 +435,7 @@ export {
     confirmBVN,
     resetPassword,
     requestForFund,
-    updateAccountDetails
+    updateAccountDetails,
+    autoSave,
+    switchAutoSave
 }

@@ -5,7 +5,7 @@ import {
     fundAccountWithCard,
     fundAccountWithExistingCard,
     debitAccount,
-    autoFundAcoount,
+    autoFundAccount,
     ajo,
     activateAjo,
     retrieveAjo,
@@ -19,7 +19,7 @@ const router = express.Router()
 router.post("/fund", auth, fundAccountWithExistingCard)
 router.post("/fund/bank", auth, fundAccountWithBankAccount)
 router.post("/fund/card", auth, fundAccountWithCard)
-router.post("/auto-fund", auth, autoFundAcoount)
+router.post("/auto-fund", auth, autoFundAccount)
 router.post("/debit", auth, debitAccount)
 router.post("/otp", auth, confirmOtp)
 router.post("/webhook", webhook)

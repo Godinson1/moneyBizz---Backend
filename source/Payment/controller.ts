@@ -84,7 +84,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
                     type.FUND,
                     userData.email,
                     userData.firstName,
-                    chargeResponse.data.amount,
+                    chargeResponse.data.amount.toString(),
                     chargeResponse.data.reference,
                     transactionData.reason,
                     chargeResponse.data.paid_at
@@ -107,7 +107,6 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
                     chargeResponse.data.created_at
                 )
                 await createNotification(
-                    userData.handle,
                     type.TRANSFER,
                     userData.handle,
                     transferData.recipientHandle,

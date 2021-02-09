@@ -9,6 +9,8 @@ import {
     updateAccountDetails,
     addBVN,
     confirmBVN,
+    autoSave,
+    switchAutoSave,
     requestForFund
 } from "./controller"
 import { router } from "./routes"
@@ -16,6 +18,8 @@ import { uploadImage } from "./helpers"
 
 export {
     getAllUser,
+    autoSave,
+    switchAutoSave,
     updateProfilePhoto,
     updateAccountDetails,
     requestForFund,

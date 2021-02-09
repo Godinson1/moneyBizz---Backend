@@ -50,23 +50,14 @@ const notifyMembers = async (
     for (let i = 0; i < array.length; i++) {
         const userData = await findUserByHandle(array[i].handle)
         if (userData) {
-            await createNotification(
-                userHandle,
-                type.AJO,
-                userHandle,
-                userData.handle,
-                userFirstName,
-                ajoId,
-                ajoCode,
-                0
-            )
+            await createNotification(type.AJO, userHandle, userData.handle, userFirstName, ajoId, ajoCode, 0)
         }
     }
     return true
 }
 
 const findUserByHandle = async (searchValue: string): Promise<IUser> => {
-    const data = await User.findOne({ handle: searchValue })
+    const data = await User.findOne({ handle: searchValue }).select("-password")
     return data
 }
 
@@ -117,16 +108,7 @@ const addNewMember = async (
                     ajo_code: "",
                     active: false
                 })
-                await createNotification(
-                    userHandle,
-                    type.AJO,
-                    userHandle,
-                    userData.handle,
-                    userFirstName,
-                    ajoData.id,
-                    ajo_code,
-                    0
-                )
+                await createNotification(type.AJO, userHandle, userData.handle, userFirstName, ajoData.id, ajo_code, 0)
             }
         } else {
             return `User with ${array[i].handle} does not exist`
@@ -136,7 +118,6 @@ const addNewMember = async (
 }
 
 const createNotification = async (
-    authHandle: string,
     sender: string,
     receiver: string,
     senderFirstName: string,
@@ -152,21 +133,19 @@ const createNotification = async (
         type: notificationType,
         typeId: id,
         message:
-            notificationType === type.TRANSFER && sender === authHandle
-                ? `You transfered the sum of ${formatter.format(validateAmount(amount.toString()))} to @${receiver}`
-                : notificationType === type.TRANSFER && sender !== receiver
-                ? `${senderFirstName} just transferred ${formatter.format(
+            notificationType === type.TRANSFER
+                ? `${senderFirstName} - @${sender} just transferred ${formatter.format(
                       validateAmount(amount.toString())
-                  )} to your attached account`
+                  )} to your attached account.`
                 : notificationType === type.AJO && sender === receiver
                 ? `You created AJo account!! Your Ajo Code is - ${code}.`
                 : notificationType === type.AJO && sender !== receiver
                 ? `${senderFirstName} created Ajo account and added you.`
-                : notificationType === type.REQUEST_FUND && sender === authHandle
-                ? `You requested the sum of ${formatter.format(validateAmount(amount.toString()))} from @${receiver}`
-                : `@${senderFirstName} - @${sender} has requested the sum of ${formatter.format(
+                : notificationType === type.REQUEST_FUND
+                ? `@${senderFirstName} - @${sender} has requested the sum of ${formatter.format(
                       validateAmount(amount.toString())
                   )} from you. "${code}"`
+                : ""
     })
     await notify.save()
 }

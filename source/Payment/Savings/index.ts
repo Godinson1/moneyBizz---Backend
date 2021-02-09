@@ -4,7 +4,7 @@ import {
     fundAccountWithExistingCard,
     fundAccountWithCard,
     debitAccount,
-    autoFundAcoount
+    autoFundAccount
 } from "./FundWallet/controller"
 import { resolveAccount, resolveBanks, createTransaction, transferFund, createRecipient } from "./FundWallet/helpers"
 import {
@@ -17,6 +17,8 @@ import {
     findUserByHandle
 } from "./Ajo/helper"
 
+import { chargeUser } from "./FundWallet/helpers"
+
 export {
     ajo,
     fundAccountWithBankAccount,
@@ -26,6 +28,7 @@ export {
     createTransaction,
     addMember,
     addNewMember,
+    chargeUser,
     resolveBanks,
     createRecipient,
     transferFund,
@@ -38,5 +41,5 @@ export {
     notifyMembers,
     resolveAccount,
     debitAccount,
-    autoFundAcoount
+    autoFundAccount
 }
