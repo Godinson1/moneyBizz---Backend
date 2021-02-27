@@ -219,7 +219,7 @@ const resetPassword = async (req: Request, res: Response): Promise<Response> => 
             await sendAuthMail(type.PASSWORD_RESET, data.mbCode, data.email, data.firstName)
             return handleResponse(res, success, OK, "An email has been sent to the provided email address.")
         } else {
-            return handleResponse(res, success, OK, `User with ${email} does not exist`)
+            return handleResponse(res, success, NOT_FOUND, `User with ${email} does not exist`)
         }
     } catch (err) {
         console.log(err)
