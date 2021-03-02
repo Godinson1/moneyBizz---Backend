@@ -39,12 +39,12 @@ const getAllUser = async (req: Request, res: Response): Promise<Response> => {
  */
 const getUser = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const userData = await findUserByHandle(req.params.id)
-        if (!userData) return handleResponse(res, error, NOT_FOUND, `User with @${req.params.id} does not exist`)
+        const userData = await findUserByHandle(req.user.handle)
+        if (!userData) return handleResponse(res, error, NOT_FOUND, `User with @${req.user.handle} does not exist`)
 
-        const connections = await findAllByHandle("Connection", req.params.id)
-        const transactions = await findAllByHandle("Transaction", req.params.id)
-        const notifications = await findAllByHandle("Notification", req.params.id)
+        const connections = await findAllByHandle("Connection", req.user.handle)
+        const transactions = await findAllByHandle("Transaction", req.user.handle)
+        const notifications = await findAllByHandle("Notification", req.user.handle)
         const data = {
             details: userData,
             connections,

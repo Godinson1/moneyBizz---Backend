@@ -19,7 +19,7 @@ import { auth } from "../Authentication"
 const router = express.Router()
 
 router.get("/", getAllUser)
-router.get("/:id", auth, getUser)
+router.get("/details", auth, getUser)
 router.delete("/", deleteAllUser)
 router.post("/activate", auth, activateUser)
 router.post("/bvn", auth, addBVN)
