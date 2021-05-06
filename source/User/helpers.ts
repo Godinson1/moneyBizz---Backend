@@ -4,15 +4,6 @@ import { UploadedFile } from "express-fileupload"
 
 const bucket = storage.bucket("bizz_bucket")
 
-/**
- *
- * @param { File } object file object that will be uploaded
- * @description - This function does the following
- * - It uploads a file to the image bucket on Google Cloud
- * - It accepts an object as an argument with the
- *   name of file and buffer
- */
-
 export const uploadImage = (file: UploadedFile): Promise<string> =>
     new Promise((resolve, reject) => {
         const { name, data } = file

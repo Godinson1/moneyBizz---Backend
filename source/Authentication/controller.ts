@@ -4,7 +4,7 @@ import { StatusCodes } from "http-status-codes"
 import { User } from "../models/"
 import { jwtSignUser, sendAuthMail, bizzCode } from "./index"
 import bcrypt from "bcryptjs"
-import { handleResponse, error, success, type } from "../Utility"
+import { handleResponse, error, success, type, PHOTO_URL } from "../Utility"
 
 const { BAD_REQUEST, INTERNAL_SERVER_ERROR, CREATED, OK } = StatusCodes
 
@@ -47,6 +47,7 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
             bvnBlacklisted: true,
             handle,
             total_balance: 0,
+            profile_photo: PHOTO_URL,
             total_credit: 0,
             total_debit: 0,
             available_balance: 0,

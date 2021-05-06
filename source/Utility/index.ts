@@ -50,6 +50,7 @@ const error = "error"
 const success = "success"
 const source = "balance"
 const GMAIL = "gmail"
+const PHOTO_URL = "https://storage.googleapis.com/bizz_bucket/noimg.png"
 const type = {
     WELCOME: "welcome",
     TRANSFER: "transfer",
@@ -75,5 +76,6 @@ export {
     regData,
     type,
     GMAIL,
-    signInTestUser
+    signInTestUser,
+    PHOTO_URL
 }
