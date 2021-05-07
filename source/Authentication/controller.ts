@@ -47,6 +47,7 @@ const registerUser = async (req: Request, res: Response): Promise<Response | voi
             bvnBlacklisted: true,
             handle,
             total_balance: 0,
+            authorization: [],
             profile_photo: PHOTO_URL,
             total_credit: 0,
             total_debit: 0,
