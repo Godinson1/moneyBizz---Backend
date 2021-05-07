@@ -94,8 +94,9 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             const balance = userData.total_credit - userData.total_debit
             userData.total_balance = balance
             userData.available_balance = balance
-            userData.authorization.push(chargeResponse.data.authorization)
-
+            if (userData.authorization.length === 0) {
+                userData.authorization.push(chargeResponse.data.authorization)
+            }
             await userData.save()
             await sendTransactionMail(
                 type.FUND,
