@@ -79,13 +79,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             )
 
             if (userData.authorization === []) {
-                User.updateOne(
-                    { email: chargeResponse.data.customer.email },
-                    { $push: { authorization: chargeResponse.data.authorization } }
-                )
-                console.log(userData)
-                console.log("Was it updated?...")
-                await userData.save()
+                console.log("Try updated the authorization link...")
             }
         }
         transactionData = await Transaction.findOne({ ref: userData.ref })
@@ -104,6 +98,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             const balance = userData.total_credit - userData.total_debit
             userData.total_balance = balance
             userData.available_balance = balance
+            userData.authorization.push(chargeResponse.data.authorization)
 
             await userData.save()
             await sendTransactionMail(
