@@ -38,7 +38,7 @@ const createTransaction = async (
     reason?: string
 ): Promise<void> => {
     const newTransaction = new Transaction({
-        initiatorHandle: `${req.user.handle}`,
+        initiatorHandle: `${req.user.handle ? req.user.handle : userData.handle}`,
         initiator_phone: userData.phone,
         initiator_bankCode: userData.bankCode,
         initiator_bank: userData.bank,

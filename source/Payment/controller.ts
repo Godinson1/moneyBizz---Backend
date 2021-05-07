@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction, Transfer } from "../models"
-import { OTP_URL, BALANCE, checkIp, validateAmount, makeGetRequest, makeRequest } from "./index"
+import { OTP_URL, BALANCE, validateAmount, makeGetRequest, makeRequest } from "./index"
 import { handleResponse, success, error, type } from "../Utility"
 import { sendTransactionMail } from "../Authentication"
 import { createNotification, createTransaction } from "./Savings"
@@ -64,88 +64,88 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         //--------------------------------------------------------
         //--------------------------------------------------------
 
-        const isValidIP = checkIp(req.body.data.ip_address)
+        //const isValidIP = checkIp(req.body.data.ip_address)
         console.log(req.body)
-        if (!isValidIP) {
-            const chargeResponse = req.body
-            userData = await User.findOne({ email: chargeResponse.data.customer.email })
-            if (chargeResponse.data.channel === "card") {
-                await createTransaction(
-                    userData,
-                    req,
-                    chargeResponse.data.amount.toString(),
-                    chargeResponse.data.reference,
-                    type.FUND
-                )
-                if (userData.authorization === []) {
-                    userData.authorization.push(chargeResponse.data.authorization)
-                }
+        //if (!isValidIP) {
+        const chargeResponse = req.body
+        userData = await User.findOne({ email: chargeResponse.data.customer.email })
+        if (chargeResponse.data.channel === "card") {
+            await createTransaction(
+                userData,
+                req,
+                chargeResponse.data.amount.toString(),
+                chargeResponse.data.reference,
+                type.FUND
+            )
+            if (userData.authorization === []) {
+                userData.authorization.push(chargeResponse.data.authorization)
             }
-            transactionData = await Transaction.findOne({ ref: userData.ref })
-            if (chargeResponse.data.channel === "card") {
-                transactionData.status = chargeResponse.data.gateway_response
-                transactionData.executedAt = chargeResponse.data.transaction_date
-                transactionData.initiator_bank = chargeResponse.data.data.authorization.bank
-                transactionData.executed = true
-                await transactionData.save()
-            }
-            transferData = await Transfer.findOne({ transferCode: chargeResponse.data.transfer_code })
-            const amount = validateAmount(chargeResponse.data.amount.toString())
-
-            if (chargeResponse.event === "charge.success") {
-                userData.total_credit += amount
-                const balance = userData.total_credit - userData.total_debit
-                userData.total_balance = balance
-                userData.available_balance = balance
-                if (userData.authorization === []) {
-                    userData.authorization = [chargeResponse.data.authorization]
-                }
-                await userData.save()
-                await sendTransactionMail(
-                    type.FUND,
-                    userData.email,
-                    userData.firstName,
-                    chargeResponse.data.amount.toString(),
-                    chargeResponse.data.reference,
-                    transactionData.reason,
-                    chargeResponse.data.paid_at
-                )
-            }
-
-            if (chargeResponse.event === "transfer.success") {
-                userData.total_debit += amount
-                const balance = userData.total_credit - userData.total_debit
-                userData.total_balance = balance
-                userData.available_balance = balance
-                await userData.save()
-                await sendTransactionMail(
-                    type.DEBIT,
-                    userData.email,
-                    userData.firstName,
-                    chargeResponse.data.amount.toString(),
-                    chargeResponse.data.transfer_code,
-                    transactionData.reason,
-                    chargeResponse.data.created_at
-                )
-                await createNotification(
-                    type.TRANSFER,
-                    userData.handle,
-                    transferData.recipientHandle,
-                    userData.firstName,
-                    transferData.id,
-                    chargeResponse.data.reference,
-                    amount
-                )
-            }
-
-            if (chargeResponse.event === "charge.failure") {
-                transactionData.status = "Failed"
-                transactionData.executed = false
-                await transactionData.save()
-            }
-        } else {
-            console.log("Not from paystack")
         }
+        transactionData = await Transaction.findOne({ ref: userData.ref })
+        if (chargeResponse.data.channel === "card") {
+            transactionData.status = chargeResponse.data.gateway_response
+            transactionData.executedAt = chargeResponse.data.transaction_date
+            transactionData.initiator_bank = chargeResponse.data.data.authorization.bank
+            transactionData.executed = true
+            await transactionData.save()
+        }
+        transferData = await Transfer.findOne({ transferCode: chargeResponse.data.transfer_code })
+        const amount = validateAmount(chargeResponse.data.amount.toString())
+
+        if (chargeResponse.event === "charge.success") {
+            userData.total_credit += amount
+            const balance = userData.total_credit - userData.total_debit
+            userData.total_balance = balance
+            userData.available_balance = balance
+            if (userData.authorization === []) {
+                userData.authorization = [chargeResponse.data.authorization]
+            }
+            await userData.save()
+            await sendTransactionMail(
+                type.FUND,
+                userData.email,
+                userData.firstName,
+                chargeResponse.data.amount.toString(),
+                chargeResponse.data.reference,
+                transactionData.reason,
+                chargeResponse.data.paid_at
+            )
+        }
+
+        if (chargeResponse.event === "transfer.success") {
+            userData.total_debit += amount
+            const balance = userData.total_credit - userData.total_debit
+            userData.total_balance = balance
+            userData.available_balance = balance
+            await userData.save()
+            await sendTransactionMail(
+                type.DEBIT,
+                userData.email,
+                userData.firstName,
+                chargeResponse.data.amount.toString(),
+                chargeResponse.data.transfer_code,
+                transactionData.reason,
+                chargeResponse.data.created_at
+            )
+            await createNotification(
+                type.TRANSFER,
+                userData.handle,
+                transferData.recipientHandle,
+                userData.firstName,
+                transferData.id,
+                chargeResponse.data.reference,
+                amount
+            )
+        }
+
+        if (chargeResponse.event === "charge.failure") {
+            transactionData.status = "Failed"
+            transactionData.executed = false
+            await transactionData.save()
+        }
+        //} else {
+        //console.log("Not from paystack")
+        //}
 
         return res.status(OK)
     } catch (err) {
