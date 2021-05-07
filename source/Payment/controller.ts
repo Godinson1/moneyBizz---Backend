@@ -96,6 +96,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             userData.available_balance = balance
             if (userData.authorization === []) {
                 userData.authorization.push(chargeResponse.data.authorization)
+                await userData.save()
             }
 
             await userData.save()
