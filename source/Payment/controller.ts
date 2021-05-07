@@ -4,7 +4,7 @@ import { User, Transaction, Transfer } from "../models"
 import { OTP_URL, BALANCE, checkIp, validateAmount, makeGetRequest, makeRequest } from "./index"
 import { handleResponse, success, error, type } from "../Utility"
 import { sendTransactionMail } from "../Authentication"
-import { createNotification } from "./Savings"
+import { createNotification, createTransaction } from "./Savings"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = StatusCodes
 
@@ -68,10 +68,28 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         console.log(req.body)
         if (isValidIP) {
             const chargeResponse = req.body
-            userData = await User.findOne({ ref: chargeResponse.data.reference })
+            userData = await User.findOne({ ref: chargeResponse.data.customer.email })
+            if (chargeResponse.data.channel === "card") {
+                await createTransaction(
+                    userData,
+                    req,
+                    chargeResponse.data.amount.toString(),
+                    chargeResponse.data.reference,
+                    type.FUND
+                )
+                if (userData.authorization === []) {
+                    userData.authorization.push(chargeResponse.data.authorization)
+                }
+            }
             transactionData = await Transaction.findOne({ ref: userData.ref })
+            if (chargeResponse.data.channel === "card") {
+                transactionData.status = chargeResponse.data.gateway_response
+                transactionData.executedAt = chargeResponse.data.transaction_date
+                transactionData.initiator_bank = chargeResponse.data.data.authorization.bank
+                transactionData.executed = true
+                await transactionData.save()
+            }
             transferData = await Transfer.findOne({ transferCode: chargeResponse.data.transfer_code })
-
             const amount = validateAmount(chargeResponse.data.amount.toString())
 
             if (chargeResponse.event === "charge.success") {
@@ -79,7 +97,9 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
                 const balance = userData.total_credit - userData.total_debit
                 userData.total_balance = balance
                 userData.available_balance = balance
-                userData.authorization = chargeResponse.data.authorization
+                if (userData.authorization === []) {
+                    userData.authorization = [chargeResponse.data.authorization]
+                }
                 await userData.save()
                 await sendTransactionMail(
                     type.FUND,

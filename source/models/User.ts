@@ -59,7 +59,7 @@ const UserSchema = new Schema(
             type: String
         },
         authorization: {
-            type: Object
+            type: Array
         },
         autoSave: {
             type: Object

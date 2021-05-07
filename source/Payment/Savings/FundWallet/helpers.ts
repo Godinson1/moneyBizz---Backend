@@ -71,7 +71,7 @@ const chargeUser = async (userData: IUser, req: Request, amount: string): Promis
         const params = JSON.stringify({
             email: req.user.email,
             amount,
-            authorization_code: userData.authorization.authorization_code
+            authorization_code: userData.authorization[0].authorization_code
         })
 
         const chargeResponse = await makeRequest(CHARGE_AUTHORIZATION, params)

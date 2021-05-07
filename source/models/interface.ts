@@ -17,7 +17,7 @@ export interface IUser extends mongoose.Document {
     lgaStateOfOrigin: string
     mbCode: string
     active: boolean
-    authorization: IAuthorization
+    authorization: Array<IAuthorization>
     autoSave: IAutosave
     bvn: string
     bvnOtp: number
@@ -125,10 +125,15 @@ export interface IAuthorization {
     last4: string
     exp_month: string
     exp_year: string
+    channel: string
     card_type: string
     bank: string
     country_code: string
     brand: string
+    signature: string
+    receiver_bank_account_number: string | number
+    receiver_bank: string | null
+    reusable: ConstrainBoolean
     account_name: string
 }
 
