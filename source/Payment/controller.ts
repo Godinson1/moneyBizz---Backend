@@ -81,6 +81,8 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             if (userData.authorization === []) {
                 console.log(chargeResponse.data.data.authorization)
                 userData.authorization.push(chargeResponse.data.authorization)
+                console.log(userData)
+                await userData.save()
             }
         }
         transactionData = await Transaction.findOne({ ref: userData.ref })
