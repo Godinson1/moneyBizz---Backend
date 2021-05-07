@@ -80,7 +80,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
 
             if (userData.authorization === []) {
                 console.log(chargeResponse.data.data.authorization)
-                userData.authorization = [chargeResponse.data.authorization]
+                userData.authorization.push(chargeResponse.data.authorization)
             }
         }
         transactionData = await Transaction.findOne({ ref: userData.ref })
