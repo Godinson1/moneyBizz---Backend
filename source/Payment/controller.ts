@@ -79,7 +79,12 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             )
 
             if (userData.authorization === []) {
-                User.updateOne({ _id: userData._id }, { $push: { authorization: chargeResponse.data.authorization } })
+                User.updateOne(
+                    { email: chargeResponse.data.customer.email },
+                    { $push: { authorization: chargeResponse.data.authorization } }
+                )
+                console.log(userData)
+                console.log("Was it updated?...")
                 await userData.save()
             }
         }
