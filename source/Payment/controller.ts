@@ -65,7 +65,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         //--------------------------------------------------------
 
         //const isValidIP = checkIp(req.body.data.ip_address)
-        console.log(req.body)
+
         //if (!isValidIP) {
         const chargeResponse = req.body
         userData = await User.findOne({ email: chargeResponse.data.customer.email })
@@ -79,9 +79,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             )
 
             if (userData.authorization === []) {
-                console.log(chargeResponse.data.data.authorization)
-                userData.authorization.push(chargeResponse.data.authorization)
-                console.log(userData)
+                User.updateOne({ _id: userData._id }, { $push: { authorization: chargeResponse.data.authorization } })
                 await userData.save()
             }
         }
