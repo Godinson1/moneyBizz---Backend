@@ -77,6 +77,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
                 chargeResponse.data.reference,
                 type.FUND
             )
+            console.log(userData)
             if (userData.authorization === []) {
                 userData.authorization = [chargeResponse.data.authorization]
             }
