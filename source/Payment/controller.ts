@@ -77,16 +77,17 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
                 chargeResponse.data.reference,
                 type.FUND
             )
-            console.log(userData.authorization)
+
             if (userData.authorization === []) {
-                userData.authorization = [chargeResponse.data.data.authorization]
+                console.log(chargeResponse.data.data.authorization)
+                userData.authorization = [chargeResponse.data.authorization]
             }
         }
         transactionData = await Transaction.findOne({ ref: userData.ref })
         if (chargeResponse.data.channel === "card") {
             transactionData.status = chargeResponse.data.gateway_response
             transactionData.executedAt = chargeResponse.data.transaction_date
-            transactionData.initiator_bank = chargeResponse.data.data.authorization.bank
+            transactionData.initiator_bank = chargeResponse.data.authorization.bank
             transactionData.executed = true
             await transactionData.save()
         }
