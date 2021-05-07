@@ -49,7 +49,8 @@ const getUser = async (req: Request, res: Response): Promise<Response> => {
             details: userData,
             connections,
             transactions,
-            notifications
+            notifications,
+            secret: `${process.env.pubKey}`
         }
 
         return res.status(OK).json({
