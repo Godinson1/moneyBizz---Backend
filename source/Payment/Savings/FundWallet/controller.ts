@@ -34,7 +34,9 @@ const fundAccountWithBankAccount = async (req: Request, res: Response): Promise<
         amount,
         bank: {
             code,
-            account_number
+            account_number,
+            phone: "+2348100000000",
+            token: "123456"
         },
         birthday: "1995-12-23"
     })

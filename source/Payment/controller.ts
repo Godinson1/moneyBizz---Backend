@@ -65,7 +65,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         //--------------------------------------------------------
 
         //const isValidIP = checkIp(req.body.data.ip_address)
-
+        res.status(OK)
         //if (!isValidIP) {
         const chargeResponse = req.body
         userData = await User.findOne({ email: chargeResponse.data.customer.email })
