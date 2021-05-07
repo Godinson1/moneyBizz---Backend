@@ -63,7 +63,6 @@ const createTransaction = async (
     userData.ref = ref
     await userData.save()
     await newTransaction.save()
-    console.log("Transaction created")
 }
 
 const chargeUser = async (userData: IUser, req: Request, amount: string): Promise<AxiosResponse> => {
