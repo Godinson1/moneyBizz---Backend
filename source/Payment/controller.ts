@@ -68,7 +68,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         console.log(req.body)
         if (isValidIP) {
             const chargeResponse = req.body
-            userData = await User.findOne({ ref: chargeResponse.data.customer.email })
+            userData = await User.findOne({ email: chargeResponse.data.customer.email })
             if (chargeResponse.data.channel === "card") {
                 await createTransaction(
                     userData,
