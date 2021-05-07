@@ -77,6 +77,9 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
                 chargeResponse.data.reference,
                 type.FUND
             )
+            if (userData.authorization.length === 0) {
+                userData.authorization.push(chargeResponse.data.authorization)
+            }
         }
         transactionData = await Transaction.findOne({ ref: userData.ref })
         if (chargeResponse.data.channel === "card") {
@@ -94,9 +97,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             const balance = userData.total_credit - userData.total_debit
             userData.total_balance = balance
             userData.available_balance = balance
-            if (userData.authorization.length === 0) {
-                userData.authorization.push(chargeResponse.data.authorization)
-            }
+
             await userData.save()
             await sendTransactionMail(
                 type.FUND,
