@@ -236,7 +236,7 @@ const resetPassword = async (req: Request, res: Response): Promise<Response> => 
  * Provide reset code and new password
  */
 const updatePassword = async (req: Request, res: Response): Promise<Response | void> => {
-    let userData: IUser
+    let userData: IUser | null
     const { mbCode, password } = req.body
 
     const { valid, errors } = validateResetPassword({
@@ -256,10 +256,10 @@ const updatePassword = async (req: Request, res: Response): Promise<Response | v
         if (userData) {
             userData.password = password
             bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(userData.password, salt, async (err, hash) => {
+                bcrypt.hash(userData!.password, salt, async (err, hash) => {
                     if (err) throw err
-                    userData.password = hash
-                    await userData.save()
+                    userData!.password = hash
+                    await userData?.save()
                     return handleResponse(res, success, OK, "Password updated successfully!")
                 })
             })

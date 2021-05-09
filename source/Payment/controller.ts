@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
-import { User, Transaction, Transfer } from "../models"
+import { User, Transaction, Transfer, IUser } from "../models"
 import { OTP_URL, BALANCE, validateAmount, makeGetRequest, makeRequest } from "./index"
 import { handleResponse, success, error, type } from "../Utility"
 import { sendTransactionMail } from "../Authentication"
@@ -25,11 +25,11 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
             if (otpResponse) {
                 const otpRes = await makeRequest(OTP_URL, data)
                 transactionData = await Transaction.findOne({ ref: userData.ref })
-                transactionData.status = otpRes.data.data.gateway_response
-                transactionData.executedAt = otpRes.data.data.transaction_date
-                transactionData.initiator_bank = otpRes.data.data.authorization.bank
-                transactionData.executed = true
-                const trans = await transactionData.save()
+                transactionData!.status = otpRes.data.data.gateway_response
+                transactionData!.executedAt = otpRes.data.data.transaction_date
+                transactionData!.initiator_bank = otpRes.data.data.authorization.bank
+                transactionData!.executed = true
+                const trans = await transactionData!.save()
 
                 return res.status(OK).json({
                     status: success,
@@ -53,7 +53,7 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
 }
 
 const webhook = async (req: Request, res: Response): Promise<Response> => {
-    let userData
+    let userData: IUser | null
     let transactionData
     let transferData
 
@@ -77,17 +77,17 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
                 chargeResponse.data.reference,
                 type.FUND
             )
-            if (userData.authorization.length === 0) {
-                userData.authorization.push(chargeResponse.data.authorization)
+            if (userData?.authorization.length === 0) {
+                userData?.authorization.push(chargeResponse.data.authorization)
             }
         }
-        transactionData = await Transaction.findOne({ ref: userData.ref })
+        transactionData = await Transaction.findOne({ ref: userData?.ref })
         if (chargeResponse.data.channel === "card") {
-            transactionData.status = chargeResponse.data.gateway_response
-            transactionData.executedAt = chargeResponse.data.transaction_date
-            transactionData.initiator_bank = chargeResponse.data.authorization.bank
-            transactionData.executed = true
-            await transactionData.save()
+            transactionData!.status = chargeResponse.data.gateway_response
+            transactionData!.executedAt = chargeResponse.data.transaction_date
+            transactionData!.initiator_bank = chargeResponse.data.authorization.bank
+            transactionData!.executed = true
+            await transactionData!.save()
         }
         transferData = await Transfer.findOne({ transferCode: chargeResponse.data.transfer_code })
         const amount = validateAmount(chargeResponse.data.amount.toString())
@@ -111,15 +111,15 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         }
 
         if (chargeResponse.event === "transfer.success") {
-            userData.total_debit += amount
-            const balance = userData.total_credit - userData.total_debit
-            userData.total_balance = balance
-            userData.available_balance = balance
-            await userData.save()
+            userData!.total_debit += amount
+            const balance = userData!.total_credit - userData!.total_debit
+            userData!.total_balance = balance
+            userData!.available_balance = balance
+            await userData!.save()
             await sendTransactionMail(
                 type.DEBIT,
-                userData.email,
-                userData.firstName,
+                userData!.email,
+                userData!.firstName,
                 chargeResponse.data.amount.toString(),
                 chargeResponse.data.transfer_code,
                 transactionData.reason,
@@ -127,9 +127,9 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             )
             await createNotification(
                 type.TRANSFER,
-                userData.handle,
+                userData!.handle,
                 transferData.recipientHandle,
-                userData.firstName,
+                userData!.firstName,
                 transferData.id,
                 chargeResponse.data.reference,
                 amount

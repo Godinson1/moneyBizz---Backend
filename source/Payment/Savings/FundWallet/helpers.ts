@@ -30,7 +30,7 @@ const transferFund = async (url: string, data: string): Promise<AxiosResponse> =
 }
 
 const createTransaction = async (
-    userData: IUser,
+    userData: IUser | null,
     req: Request,
     amount: string,
     ref: string,
@@ -38,11 +38,11 @@ const createTransaction = async (
     reason?: string
 ): Promise<void> => {
     const newTransaction = new Transaction({
-        initiatorHandle: userData.handle,
-        initiator_phone: userData.phone,
-        initiator_bankCode: userData.bankCode,
-        initiator_bank: userData.bank,
-        initiator_accountNumber: userData.accountNumber,
+        initiatorHandle: userData?.handle,
+        initiator_phone: userData?.phone,
+        initiator_bankCode: userData?.bankCode,
+        initiator_bank: userData?.bank,
+        initiator_accountNumber: userData?.accountNumber,
         recipient: "self",
         recipient_bank: "self",
         recipient_accountNumber: "self",
@@ -60,8 +60,8 @@ const createTransaction = async (
         status: "in-process",
         type: type.FUND
     })
-    userData.ref = ref
-    await userData.save()
+    userData!.ref = ref
+    await userData?.save()
     await newTransaction.save()
 }
 
