@@ -67,10 +67,10 @@ const findAllByHandle = async (
 ): Promise<Array<INotification | IConnection | ITransaction | undefined>> => {
     let data
     if (ModelType === "Notification") {
-        data = await Notification.find({ sender: searchValue })
+        data = await Notification.find({ sender: searchValue }).limit(20)
         return data
     } else if (ModelType === "Transaction") {
-        data = await Transaction.find({ initiatorHandle: searchValue })
+        data = await Transaction.find({ initiatorHandle: searchValue }).limit(20)
         return data
     } else if (ModelType === "Connection") {
         data = await Connection.find({ connectorHandle: searchValue })
