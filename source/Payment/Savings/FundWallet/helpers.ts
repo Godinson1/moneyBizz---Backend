@@ -65,12 +65,12 @@ const createTransaction = async (
     await newTransaction.save()
 }
 
-const chargeUser = async (userData: IUser, req: Request, amount: string): Promise<AxiosResponse> => {
+const chargeUser = async (userData: IUser | null, req: Request, amount: string): Promise<AxiosResponse> => {
     try {
         const params = JSON.stringify({
             email: req.user.email,
             amount,
-            authorization_code: userData.authorization[0].authorization_code
+            authorization_code: userData?.authorization[0].authorization_code
         })
 
         const chargeResponse = await makeRequest(CHARGE_AUTHORIZATION, params)

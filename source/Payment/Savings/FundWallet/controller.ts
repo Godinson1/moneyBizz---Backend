@@ -231,7 +231,7 @@ const debitAccount = async (req: Request, res: Response): Promise<Response | voi
  * Validate request and debit user account
  */
 const autoFundAccount = async (req: Request, res: Response): Promise<Response | void> => {
-    let userData: IUser
+    let userData: IUser | null
     const { interval, minute, hour, dayOfMonth, dayOfWeek, amount } = req.body
 
     if (isEmpty(amount.toString())) return handleResponse(res, error, BAD_REQUEST, "Amount must not be empty..")

@@ -122,24 +122,24 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
                 userData!.firstName,
                 chargeResponse.data.amount.toString(),
                 chargeResponse.data.transfer_code,
-                transactionData.reason,
+                transactionData?.reason,
                 chargeResponse.data.created_at
             )
             await createNotification(
                 type.TRANSFER,
                 userData!.handle,
-                transferData.recipientHandle,
+                transferData?.recipientHandle,
                 userData!.firstName,
-                transferData.id,
+                transferData?.id,
                 chargeResponse.data.reference,
                 amount
             )
         }
 
         if (chargeResponse.event === "charge.failure") {
-            transactionData.status = "Failed"
-            transactionData.executed = false
-            await transactionData.save()
+            transactionData!.status = "Failed"
+            transactionData!.executed = false
+            await transactionData!.save()
         }
         //} else {
         //console.log("Not from paystack")
