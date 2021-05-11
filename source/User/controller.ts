@@ -115,8 +115,8 @@ const activateUser = async (req: Request, res: Response): Promise<Response> => {
  * AIM - Add user bvn and update user's account
  * Send code to phone number associated with bvn for ownership verification
  */
-const addBVN = async (req: Request, res: Response): Promise<any> => {
-    /*let userData
+const addBVN = async (req: Request, res: Response): Promise<Response> => {
+    let userData
     const { bvn } = req.body
 
     if (isEmpty(bvn.toString())) return handleResponse(res, error, BAD_REQUEST, "BVN cannot be empty..")
@@ -133,7 +133,7 @@ const addBVN = async (req: Request, res: Response): Promise<any> => {
             } else {
                 const data = await makeGetRequest(`${BVN}/${bvn}`)
                 const response = data.data
-                if (response.status === true) {
+                if (response.status === true && userData !== null) {
                     //Using or "" because I ain't checking for all user's bvn yet
                     userData = await User.findOne({ handle: req.user.handle })
                     const userInfo = response.data
@@ -168,7 +168,7 @@ const addBVN = async (req: Request, res: Response): Promise<any> => {
     } catch (err) {
         console.log(err)
         return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
-    }*/
+    }
 }
 
 /*
@@ -287,14 +287,14 @@ const updateProfilePhoto = async (req: Request, res: Response): Promise<Response
 
         if (req.files.mb_image) {
             const image = req.files.mb_image as UploadedFile
-            if (!prefferedTypes.includes(image.mimetype))
+            if (!prefferedTypes.includes(image.mimetype) && userData !== null)
                 return handleResponse(res, error, BAD_REQUEST, "Please select a valid photo")
             //Upload image
             const url = await uploadImage(image)
             //Find authenticated user and update photo here
             userData = await findUserByHandle(req.user.handle)
-            userData.profile_photo = url
-            const data = await userData.save()
+            userData!.profile_photo = url
+            const data = await userData?.save()
             return res.status(OK).json({
                 status: success,
                 message: "Profile photo updated successfully..",

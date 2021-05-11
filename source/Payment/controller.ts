@@ -14,6 +14,7 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
     try {
         try {
             const userData = await User.findOne({ _id: req.user.id })
+            transactionData = await Transaction.findOne({ ref: userData.ref })
             if (!userData) return handleResponse(res, error, BAD_REQUEST, "You can't carry out this operation..")
 
             const data = JSON.stringify({
@@ -22,14 +23,12 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
             })
             const otpResponse = await makeRequest(OTP_URL, data)
 
-            if (otpResponse) {
+            if (otpResponse && transactionData !== null) {
                 const otpRes = await makeRequest(OTP_URL, data)
-                transactionData = await Transaction.findOne({ ref: userData.ref })
-                transactionData!.status = otpRes.data.data.gateway_response
-                transactionData!.executedAt = otpRes.data.data.transaction_date
-                transactionData!.initiator_bank = otpRes.data.data.authorization.bank
-                transactionData!.executed = true
-                const trans = await transactionData!.save()
+                transactionData.executedAt = otpRes.data.data.transaction_date
+                transactionData.initiator_bank = otpRes.data.data.authorization.bank
+                transactionData.executed = true
+                const trans = await transactionData.save()
 
                 return res.status(OK).json({
                     status: success,
@@ -82,22 +81,26 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             }
         }
         transactionData = await Transaction.findOne({ ref: userData?.ref })
-        if (chargeResponse.data.channel === "card") {
-            transactionData!.status = chargeResponse.data.gateway_response
-            transactionData!.executedAt = chargeResponse.data.transaction_date
-            transactionData!.initiator_bank = chargeResponse.data.authorization.bank
-            transactionData!.executed = true
-            await transactionData!.save()
+        if (chargeResponse.data.channel === "card" && transactionData !== null) {
+            transactionData.executedAt = chargeResponse.data.transaction_date
+            transactionData.initiator_bank = chargeResponse.data.authorization.bank
+            transactionData.executed = true
+            await transactionData.save()
         }
         transferData = await Transfer.findOne({ transferCode: chargeResponse.data.transfer_code })
         const amount = validateAmount(chargeResponse.data.amount.toString())
 
-        if (chargeResponse.event === "charge.success" && userData !== null && transactionData?.status !== APPROVED) {
+        if (
+            chargeResponse.event === "charge.success" &&
+            userData !== null &&
+            transactionData !== null &&
+            transactionData.status !== APPROVED
+        ) {
             userData.total_credit += amount
             const balance = userData.total_credit - userData.total_debit
             userData.total_balance = balance
             userData.available_balance = balance
-            transactionData!.status = chargeResponse.data.gateway_response
+            transactionData.status = chargeResponse.data.gateway_response
 
             await userData.save()
             await transactionData.save()
@@ -112,16 +115,16 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             )
         }
 
-        if (chargeResponse.event === "transfer.success") {
-            userData!.total_debit += amount
-            const balance = userData!.total_credit - userData!.total_debit
-            userData!.total_balance = balance
-            userData!.available_balance = balance
-            await userData!.save()
+        if (chargeResponse.event === "transfer.success" && userData !== null) {
+            userData.total_debit += amount
+            const balance = userData.total_credit - userData.total_debit
+            userData.total_balance = balance
+            userData.available_balance = balance
+            await userData.save()
             await sendTransactionMail(
                 type.DEBIT,
-                userData!.email,
-                userData!.firstName,
+                userData.email,
+                userData.firstName,
                 chargeResponse.data.amount.toString(),
                 chargeResponse.data.transfer_code,
                 transactionData?.reason,
@@ -129,19 +132,19 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
             )
             await createNotification(
                 type.TRANSFER,
-                userData!.handle,
+                userData.handle,
                 transferData?.recipientHandle,
-                userData!.firstName,
+                userData.firstName,
                 transferData?.id,
                 chargeResponse.data.reference,
                 amount
             )
         }
 
-        if (chargeResponse.event === "charge.failure") {
-            transactionData!.status = "Failed"
-            transactionData!.executed = false
-            await transactionData!.save()
+        if (chargeResponse.event === "charge.failure" && transactionData !== null) {
+            transactionData.status = "Failed"
+            transactionData.executed = false
+            await transactionData.save()
         }
         //} else {
         //console.log("Not from paystack")

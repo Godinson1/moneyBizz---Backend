@@ -56,7 +56,7 @@ const notifyMembers = async (
     return true
 }
 
-const findUserByHandle = async (searchValue: string): Promise<IUser> => {
+const findUserByHandle = async (searchValue: string): Promise<IUser | null> => {
     const data = await User.findOne({ handle: searchValue }).select("-password")
     return data
 }
