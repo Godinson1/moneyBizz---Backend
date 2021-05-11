@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { User, IUser } from "../models"
+import { User, IUser, Transaction } from "../models"
 import { StatusCodes } from "http-status-codes"
 import { isEmail, isEmpty, isValidNumber, validateResetPassword } from "../validations"
 import { findUserByHandle, findAllByHandle, BVN } from "../Payment"
@@ -426,6 +426,33 @@ const switchAutoSave = async (req: Request, res: Response): Promise<Response> =>
     }
 }
 
+const getTransactions = async (req: Request, res: Response): Promise<Response> => {
+    const pagination = req.body.pagination ? parseInt(req.body.pagination) : 10
+    //PageNumber From which Page to Start
+    const pageNumber = req.body.page ? parseInt(req.body.page) : 1
+    try {
+        const data = await Transaction.find({ userId: req.user.userId })
+        const data_result = await Transaction.find({ userId: req.user.userId })
+            .sort({ createdAt: -1 })
+            .skip((pageNumber - 1) * pagination)
+            .limit(pagination)
+        const data_length = data.length
+        const num = data_length / pagination
+        const total_page = Number.isInteger(num) === true ? num : Math.ceil(num)
+
+        return res.status(200).send({
+            status: "success",
+            message: "Data retrieved successfully.",
+            total_result: data_length,
+            total_page,
+            data: data_result
+        })
+    } catch (err) {
+        console.log(err)
+        return handleResponse(res, "error", 500, "Something went wrong")
+    }
+}
+
 export {
     getAllUser,
     deleteAllUser,
@@ -439,5 +466,6 @@ export {
     requestForFund,
     updateAccountDetails,
     autoSave,
-    switchAutoSave
+    switchAutoSave,
+    getTransactions
 }

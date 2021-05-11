@@ -92,7 +92,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         transferData = await Transfer.findOne({ transferCode: chargeResponse.data.transfer_code })
         const amount = validateAmount(chargeResponse.data.amount.toString())
 
-        if (chargeResponse.event === "charge.success" && userData !== null && transactionData) {
+        if (chargeResponse.event === "charge.success" && userData !== null && transactionData.executed === false) {
             userData.total_credit += amount
             const balance = userData.total_credit - userData.total_debit
             userData.total_balance = balance
