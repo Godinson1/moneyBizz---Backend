@@ -67,13 +67,13 @@ const findAllByHandle = async (
 ): Promise<Array<INotification | IConnection | ITransaction | undefined>> => {
     let data
     if (ModelType === "Notification") {
-        data = await Notification.find({ sender: searchValue }).sort({createdAt: -1}).limit(20)
+        data = await Notification.find({ sender: searchValue }).sort({ createdAt: -1 }).limit(20)
         return data
     } else if (ModelType === "Transaction") {
-        data = await Transaction.find({ initiatorHandle: searchValue }).sort({createdAt: -1}).limit(20)
+        data = await Transaction.find({ initiatorHandle: searchValue }).sort({ createdAt: -1 }).limit(20)
         return data
     } else if (ModelType === "Connection") {
-        data = await Connection.find({ connectorHandle: searchValue }).sort({createdAt: -1}).limit(20)
+        data = await Connection.find({ connectorHandle: searchValue }).sort({ createdAt: -1 }).limit(20)
         return data
     } else {
         return []
@@ -92,7 +92,7 @@ const addNewMember = async (
         const userData = await findUserByHandle(array[i].handle)
         if (userData) {
             const ajoData = await Ajo.findOne({ ajo_code })
-            const isExist = ajoData.members.find((member: IAjoMember) => member.handle === array[i].handle)
+            const isExist = ajoData?.members.find((member: IAjoMember) => member.handle === array[i].handle)
             if (isExist) {
                 return (res.error = `User with ${array[i].handle} is already added`)
             } else {
@@ -108,7 +108,7 @@ const addNewMember = async (
                     ajo_code: "",
                     active: false
                 })
-                await createNotification(type.AJO, userHandle, userData.handle, userFirstName, ajoData.id, ajo_code, 0)
+                await createNotification(type.AJO, userHandle, userData.handle, userFirstName, ajoData?.id, ajo_code, 0)
             }
         } else {
             return `User with ${array[i].handle} does not exist`
@@ -120,7 +120,7 @@ const addNewMember = async (
 const createNotification = async (
     sender: string,
     receiver: string,
-    senderFirstName: string,
+    senderFirstName: string | undefined,
     id: string,
     code: string,
     notificationType: string,

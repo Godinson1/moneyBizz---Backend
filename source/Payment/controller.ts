@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { User, Transaction, Transfer, IUser } from "../models"
 import { OTP_URL, BALANCE, validateAmount, makeGetRequest, makeRequest } from "./index"
-import { handleResponse, success, error, type } from "../Utility"
+import { handleResponse, success, error, type, APPROVED } from "../Utility"
 import { sendTransactionMail } from "../Authentication"
 import { createNotification, createTransaction } from "./Savings"
 
@@ -92,11 +92,12 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
         transferData = await Transfer.findOne({ transferCode: chargeResponse.data.transfer_code })
         const amount = validateAmount(chargeResponse.data.amount.toString())
 
-        if (chargeResponse.event === "charge.success" && userData !== null && transactionData.executed === false) {
+        if (chargeResponse.event === "charge.success" && userData !== null && transactionData.status !== APPROVED) {
             userData.total_credit += amount
             const balance = userData.total_credit - userData.total_debit
             userData.total_balance = balance
             userData.available_balance = balance
+            transactionData!.status = chargeResponse.data.gateway_response
 
             await userData.save()
             await sendTransactionMail(
@@ -105,7 +106,7 @@ const webhook = async (req: Request, res: Response): Promise<Response> => {
                 userData.firstName,
                 chargeResponse.data.amount.toString(),
                 chargeResponse.data.reference,
-                transactionData.reason,
+                transactionData?.reason,
                 chargeResponse.data.paid_at
             )
         }

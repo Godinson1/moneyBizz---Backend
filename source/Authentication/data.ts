@@ -46,7 +46,13 @@ const resetPasswordBody = (code: string, firstName: string): string => {
     <b>Team MoneyBizz<b>`
 }
 
-const fundWalletBody = (firstName: string, amount: string, reference: string, date: string, reason: string): string => {
+const fundWalletBody = (
+    firstName: string,
+    amount: string,
+    reference: string,
+    date: string,
+    reason: string | undefined
+): string => {
     return `<h2>Hello ${firstName} &#128075;</h2> 
     <p>Your MoneyBizz bizz wallet has been credited successfully.<br>
     <br>
@@ -70,7 +76,7 @@ const debitWalletBody = (
     amount: string,
     reference: string,
     date: string,
-    reason: string
+    reason: string | undefined
 ): string => {
     return `<h2>Hello ${firstName} &#128075;</h2> 
     <p>Your MoneyBizz bizz wallet has been debited successfully.<br>

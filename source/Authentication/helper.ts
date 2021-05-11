@@ -61,7 +61,7 @@ const sendTransactionMail = (
     firstName: string,
     amount: string,
     reference: string,
-    reason: string,
+    reason: string | undefined,
     date: string
 ): void => {
     const transporter = nodemailer.createTransport({
