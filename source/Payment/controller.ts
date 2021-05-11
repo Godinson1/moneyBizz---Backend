@@ -14,7 +14,7 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
     try {
         try {
             const userData = await User.findOne({ _id: req.user.id })
-            transactionData = await Transaction.findOne({ ref: userData.ref })
+            transactionData = await Transaction.findOne({ ref: userData?.ref })
             if (!userData) return handleResponse(res, error, BAD_REQUEST, "You can't carry out this operation..")
 
             const data = JSON.stringify({

@@ -115,8 +115,8 @@ const activateUser = async (req: Request, res: Response): Promise<Response> => {
  * AIM - Add user bvn and update user's account
  * Send code to phone number associated with bvn for ownership verification
  */
-const addBVN = async (req: Request, res: Response): Promise<Response> => {
-    let userData
+const addBVN = async (req: Request, res: Response): Promise<any> => {
+    /*let userData
     const { bvn } = req.body
 
     if (isEmpty(bvn.toString())) return handleResponse(res, error, BAD_REQUEST, "BVN cannot be empty..")
@@ -168,7 +168,7 @@ const addBVN = async (req: Request, res: Response): Promise<Response> => {
     } catch (err) {
         console.log(err)
         return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
-    }
+    }*/
 }
 
 /*
