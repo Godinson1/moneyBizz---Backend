@@ -12,4 +12,6 @@ declare global {
     }
 }
 
+declare module "node-schedule"
+
 export {}
