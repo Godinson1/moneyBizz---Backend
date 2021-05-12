@@ -10,7 +10,6 @@ import { bizzCode, uniqueCode, sendMobileOTP, validatePhone, sendAuthMail } from
 import bcrypt from "bcryptjs"
 import { uploadImage } from "./index"
 import { UploadedFile } from "express-fileupload"
-import cron from "node-cron"
 import schedule from "node-schedule"
 import { createNotification } from "../Payment/Savings"
 
@@ -465,7 +464,7 @@ const getTransactions = async (req: Request, res: Response): Promise<Response> =
 const checkCron = async (req: Request, res: Response): Promise<Response> => {
     const runningJobs = await schedule.scheduledJobs
     console.log(runningJobs)
-    return res.status(200).json({ message: "All running jobs" })
+    return res.status(200).json({ message: "All running jobs for autosave" })
 }
 
 export {
