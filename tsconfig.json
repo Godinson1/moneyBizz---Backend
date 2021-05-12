@@ -7,8 +7,9 @@
         "strict": true /* Enable all strict type-checking options. */,
         "resolveJsonModule": true,
         "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
-        "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
+        "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
+        "typeRoots": [ "./typings", "./node_modules/@types"]
     },
     "include": ["source/**/*.ts", "source/server.ts", "app.ts"],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules", "typings"]
 }
