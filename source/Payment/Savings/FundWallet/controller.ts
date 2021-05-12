@@ -12,8 +12,8 @@ import {
 import { handleResponse, success, error, source, type } from "../../../Utility"
 import { isEmpty } from "../../../validations"
 import { transferFund, createRecipient, chargeUser } from "../../Savings"
-import { createTransaction } from "../index"
-import cron from "node-cron"
+import { createTransaction, getInterval } from "../index"
+import schedule from "node-schedule"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND } = StatusCodes
 
@@ -232,85 +232,34 @@ const debitAccount = async (req: Request, res: Response): Promise<Response | voi
  */
 const autoFundAccount = async (req: Request, res: Response): Promise<Response | void> => {
     let userData: IUser | null
-    const { interval, minute, hour, dayOfMonth, dayOfWeek, amount } = req.body
 
-    if (isEmpty(amount.toString())) return handleResponse(res, error, BAD_REQUEST, "Amount must not be empty..")
+    console.log("reading cron-start")
 
     try {
         try {
             userData = await User.findOne({ _id: req.user.id })
             if (!userData) return handleResponse(res, error, NOT_FOUND, "You can't carry out this operation..")
 
-            if (userData.authorization && Object.keys(userData.authorization).length !== 0) {
+            if (userData.authorization && userData.authorization.length !== 0) {
                 if (Object.keys(userData.autoSave).length === 0)
                     return handleResponse(res, error, NOT_FOUND, "Please update your auto save setting.")
 
-                const data = {
-                    interval,
-                    minute,
-                    hour,
-                    dayOfMonth,
-                    dayOfWeek,
-                    amount,
-                    active: true
-                }
-                userData.autoSave = data
-
-                if (interval === "daily") {
-                    cron.schedule(`${minute} ${hour} * * *`, async () => {
-                        console.log("Testing User User")
+                const { interval, minute, hour, dayOfMonth, dayOfWeek, amount } = userData.autoSave
+                console.log({ interval, minute, hour, dayOfMonth, dayOfWeek, amount })
+                schedule.scheduleJob(
+                    req.user.email,
+                    getInterval(interval, minute, hour, dayOfMonth, dayOfWeek),
+                    async () => {
+                        console.log(`@${req.user.handle} auto-credited ₦${amount} successfully.`)
                         const chargeResponse = await chargeUser(userData, req, amount)
                         if (typeof chargeResponse === "string")
                             return handleResponse(res, error, NOT_FOUND, chargeResponse)
-                        if (chargeResponse.data.status) {
-                            return res.status(OK).json({
-                                status: success,
-                                message: "Payment attempted successfully",
-                                data: chargeResponse.data
-                            })
-                        }
-                    })
-                } else if (interval === "weekly") {
-                    cron.schedule(`${minute} ${hour} * * ${dayOfWeek}`, async () => {
-                        console.log("Testing User User")
-                        const chargeResponse = await chargeUser(userData, req, amount)
-                        if (typeof chargeResponse === "string")
-                            return handleResponse(res, error, NOT_FOUND, chargeResponse)
-                        if (chargeResponse.data.status) {
-                            return res.status(OK).json({
-                                status: success,
-                                message: "Payment attempted successfully",
-                                data: chargeResponse.data
-                            })
-                        }
-                    })
-                } else if (interval === "monthly") {
-                    cron.schedule(`${minute} ${hour} ${dayOfMonth} * *`, async () => {
-                        console.log("Testing User User")
-                    })
-                    const chargeResponse = await chargeUser(userData, req, amount)
-                    if (typeof chargeResponse === "string") return handleResponse(res, error, NOT_FOUND, chargeResponse)
-                    if (chargeResponse.data.status) {
-                        return res.status(OK).json({
-                            status: success,
-                            message: "Payment attempted successfully",
-                            data: chargeResponse.data
-                        })
                     }
-                } else if (interval === "testing") {
-                    cron.schedule(`${minute} * * * *`, async () => {
-                        console.log("Testing User User")
-                    })
-                    const chargeResponse = await chargeUser(userData, req, amount)
-                    if (typeof chargeResponse === "string") return handleResponse(res, error, NOT_FOUND, chargeResponse)
-                    if (chargeResponse.data.status) {
-                        return res.status(OK).json({
-                            status: success,
-                            message: "Payment attempted successfully",
-                            data: chargeResponse.data
-                        })
-                    }
-                }
+                )
+                return res.status(OK).json({
+                    status: success,
+                    message: "Autosave activated successfully."
+                })
             } else {
                 return handleResponse(
                     res,

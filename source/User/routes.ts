@@ -12,7 +12,8 @@ import {
     addBVN,
     autoSave,
     switchAutoSave,
-    confirmBVN
+    confirmBVN,
+    checkCron
 } from "./index"
 import { auth } from "../Authentication"
 
@@ -21,6 +22,7 @@ const router = express.Router()
 router.get("/", getAllUser)
 router.get("/details", auth, getUser)
 router.delete("/", deleteAllUser)
+router.get("/check-cron", checkCron)
 router.post("/activate", auth, activateUser)
 router.post("/bvn", auth, addBVN)
 router.post("/bvn/confirm", auth, confirmBVN)

@@ -143,6 +143,6 @@ export interface IAutosave {
     hour: number
     dayOfMonth: number
     dayOfWeek: number
-    amount: number
+    amount: string
     active: boolean
 }

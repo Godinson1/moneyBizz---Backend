@@ -10,6 +10,7 @@ import {
     addBVN,
     confirmBVN,
     autoSave,
+    checkCron,
     switchAutoSave,
     requestForFund
 } from "./controller"
@@ -31,5 +32,6 @@ export {
     getUser,
     addBVN,
     confirmBVN,
-    uploadImage
+    uploadImage,
+    checkCron
 }

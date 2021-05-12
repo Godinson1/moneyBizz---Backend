@@ -17,7 +17,7 @@ import {
     findUserByHandle
 } from "./Ajo/helper"
 
-import { chargeUser } from "./FundWallet/helpers"
+import { chargeUser, getInterval } from "./FundWallet/helpers"
 
 export {
     ajo,
@@ -41,5 +41,6 @@ export {
     notifyMembers,
     resolveAccount,
     debitAccount,
-    autoFundAccount
+    autoFundAccount,
+    getInterval
 }

@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { User, IUser, Transaction } from "../models"
 import { StatusCodes } from "http-status-codes"
+
 import { isEmail, isEmpty, isValidNumber, validateResetPassword } from "../validations"
 import { findUserByHandle, findAllByHandle, BVN } from "../Payment"
 import { handleResponse, error, success, type } from "../Utility"
@@ -9,6 +10,8 @@ import { bizzCode, uniqueCode, sendMobileOTP, validatePhone, sendAuthMail } from
 import bcrypt from "bcryptjs"
 import { uploadImage } from "./index"
 import { UploadedFile } from "express-fileupload"
+import cron from "node-cron"
+import schedule from "node-schedule"
 import { createNotification } from "../Payment/Savings"
 
 const { OK, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED, BAD_REQUEST } = StatusCodes
@@ -392,7 +395,7 @@ const autoSave = async (req: Request, res: Response): Promise<Response> => {
             }
             userData.autoSave = data
             await userData.save()
-            return handleResponse(res, success, OK, `Auto feature updated successfully..`)
+            return handleResponse(res, success, OK, `Autosave settings updated successfully..`)
         } else {
             return handleResponse(res, error, NOT_FOUND, `You can't carry out this operation.`)
         }
@@ -414,9 +417,15 @@ const switchAutoSave = async (req: Request, res: Response): Promise<Response> =>
     try {
         userData = await findUserByHandle(req.user.handle)
         if (userData) {
-            userData.autoSave.active = active
-            await userData.save()
-            return handleResponse(res, success, OK, `Auto feature updated successfully..`)
+            const existingJob = schedule.scheduledJobs[req.user.email]
+            if (existingJob === null || existingJob === undefined) {
+                return handleResponse(res, error, BAD_REQUEST, `Autosave settings not initiated.`)
+            } else {
+                existingJob.cancel()
+                userData.autoSave.active = active
+                await userData.save()
+                return handleResponse(res, success, OK, `Autosave turned off successfully..`)
+            }
         } else {
             return handleResponse(res, error, NOT_FOUND, `You can't carry out this operation.`)
         }
@@ -453,6 +462,12 @@ const getTransactions = async (req: Request, res: Response): Promise<Response> =
     }
 }
 
+const checkCron = async (req: Request, res: Response): Promise<Response> => {
+    const runningJobs = await schedule.scheduledJobs
+    console.log(runningJobs)
+    return res.status(200).json({ message: "All running jobs" })
+}
+
 export {
     getAllUser,
     deleteAllUser,
@@ -467,5 +482,6 @@ export {
     updateAccountDetails,
     autoSave,
     switchAutoSave,
-    getTransactions
+    getTransactions,
+    checkCron
 }

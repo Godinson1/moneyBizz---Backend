@@ -84,4 +84,18 @@ const chargeUser = async (userData: IUser | null, req: Request, amount: string):
     }
 }
 
-export { resolveAccount, resolveBanks, createRecipient, transferFund, createTransaction, chargeUser }
+const getInterval = (interval: string, minute: number, hour: number, dayOfMonth: number, dayOfWeek: number): string => {
+    let setInterval = ""
+    if (interval === "weekly") {
+        setInterval = `${minute} ${hour} * * ${dayOfWeek}`
+    } else if (interval === "daily") {
+        setInterval = `${minute} ${hour} * * *`
+    } else if (interval === "monthly") {
+        setInterval = `${minute} ${hour} ${dayOfMonth} * *`
+    } else {
+        setInterval = `*/2 * * * *`
+    }
+    return setInterval
+}
+
+export { resolveAccount, resolveBanks, createRecipient, transferFund, getInterval, createTransaction, chargeUser }
