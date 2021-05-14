@@ -13,7 +13,7 @@ import { handleResponse, success, error, source, type } from "../../../Utility"
 import { isEmpty } from "../../../validations"
 import { transferFund, createRecipient, chargeUser } from "../../Savings"
 import { createTransaction, getInterval } from "../index"
-import schedule from "node-schedule"
+import * as schedule from "node-schedule"
 
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST, NOT_FOUND } = StatusCodes
 

@@ -9,7 +9,7 @@ import { bizzCode, uniqueCode, sendMobileOTP, validatePhone, sendAuthMail } from
 import bcrypt from "bcryptjs"
 import { uploadImage } from "./index"
 import { UploadedFile } from "express-fileupload"
-import schedule from "node-schedule"
+import * as schedule from "node-schedule"
 import { createNotification } from "../Payment/Savings"
 
 const { OK, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED, BAD_REQUEST } = StatusCodes
