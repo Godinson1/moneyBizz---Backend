@@ -7,8 +7,8 @@ import {
     updatePassword,
     updateProfilePhoto,
     updateAccountDetails,
-    addBVN,
-    confirmBVN,
+    VerifyUser,
+    confirmUserVerification,
     autoSave,
     checkCron,
     switchAutoSave,
@@ -30,8 +30,8 @@ export {
     activateUser,
     updatePassword,
     getUser,
-    addBVN,
-    confirmBVN,
+    VerifyUser,
+    confirmUserVerification,
     uploadImage,
     checkCron
 }

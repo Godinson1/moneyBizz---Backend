@@ -2,10 +2,9 @@ import { Request, Response } from "express"
 import { User, IUser, Transaction } from "../models"
 import { StatusCodes } from "http-status-codes"
 
-import { isEmail, isEmpty, isValidNumber, validateResetPassword } from "../validations"
-import { findUserByHandle, findAllByHandle, BVN } from "../Payment"
+import { isEmail, isEmpty, validateResetPassword } from "../validations"
+import { findUserByHandle, findAllByHandle } from "../Payment"
 import { handleResponse, error, success, type } from "../Utility"
-import { makeGetRequest } from "../Payment/helpers"
 import { bizzCode, uniqueCode, sendMobileOTP, validatePhone, sendAuthMail } from "../Authentication"
 import bcrypt from "bcryptjs"
 import { uploadImage } from "./index"
@@ -111,89 +110,63 @@ const activateUser = async (req: Request, res: Response): Promise<Response> => {
 }
 
 /*
- * LOCKED TEMPORARILY!!!
- * NAME - addBVN
- * @REQUEST METHOD - POST
- * AIM - Add user bvn and update user's account
- * Send code to phone number associated with bvn for ownership verification
+ * NAME - Verify User
+ * @REQUEST METHOD - PUT
+ * AIM - Add user active mobile number and date of birth
+ * with other info to update user's account
+ * Send code to phone number for ownership verification
  */
-const addBVN = async (req: Request, res: Response): Promise<any> => {
-    /*let userData
-    const { bvn } = req.body
-
-    if (isEmpty(bvn.toString())) return handleResponse(res, error, BAD_REQUEST, "BVN cannot be empty..")
-    if (!isValidNumber(bvn.toString()))
-        return handleResponse(res, error, BAD_REQUEST, "Must be a valid Bank Verification Number.")
-    if (typeof bvn === "number")
-        return handleResponse(res, error, BAD_REQUEST, "Abeg, submit string make I no block you!")
+const VerifyUser = async (req: Request, res: Response): Promise<Response> => {
+    let userData
+    const { sex, phone, address, stateOrigin, dateOfBirth } = req.body
 
     try {
-        const bvnExist = await findUserByHandle(req.user.handle)
-        if (bvnExist) {
-            if (bvnExist.bvn === bvn) {
-                return handleResponse(res, error, BAD_REQUEST, "Bvn already linked with bizz account")
-            } else {
-                const data = await makeGetRequest(`${BVN}/${bvn}`)
-                const response = data.data
-                if (response.status === true && userData !== null) {
-                    //Using or "" because I ain't checking for all user's bvn yet
-                    userData = await User.findOne({ handle: req.user.handle })
-                    const userInfo = response.data
-                    userData.dateOfBirth = userInfo.formatted_dob || ""
-                    userData.phone = userInfo.mobile || ""
-                    userData.phoneTwo = userInfo.mobile2 || ""
-                    userData.bank = userInfo.enrollment_bank.name || ""
-                    userData.bankCode = userInfo.enrollment_bank.code || ""
-                    userData.bvn = userInfo.bvn || ""
-                    userData.bvnBlacklisted = userInfo.is_blacklisted || ""
-                    userData.sex = userInfo.gender || ""
-                    userData.address = userInfo.residential_address || ""
-                    userData.lgaOfAddress = userInfo.lga_of_residence || ""
-                    userData.stateOfOrigin = userInfo.state_of_origin || ""
-                    userData.lgaStateOfOrigin = userInfo.lga_of_origin || ""
-                    userData.bvnOtp = uniqueCode()
-                    const updatedUserData = await userData.save()
-                    await sendMobileOTP(updatedUserData.bvnOtp, validatePhone(updatedUserData.phoneTwo))
-                    return handleResponse(
-                        res,
-                        success,
-                        OK,
-                        "Bvn retrieved successfully, Please enter Otp to confirm ownership."
-                    )
-                } else {
-                    return handleResponse(res, error, BAD_REQUEST, response.message)
-                }
-            }
+        userData = await findUserByHandle(req.user.handle)
+        if (userData) {
+            userData = await User.findOne({ handle: req.user.handle })
+            userData.dateOfBirth = dateOfBirth
+            userData.phone = phone.toString()
+            userData.sex = sex
+            userData.address = address
+            userData.stateOfOrigin = stateOrigin
+            userData.bvnOtp = uniqueCode()
+            const updatedUserData = await userData.save()
+            await sendMobileOTP(updatedUserData.bvnOtp, validatePhone(updatedUserData.phone))
+            return handleResponse(
+                res,
+                success,
+                OK,
+                "Phone number verified successfully, Please enter Otp to confirm ownership."
+            )
         } else {
-            return handleResponse(res, error, BAD_REQUEST, "We no see this one o. Omo!")
+            return handleResponse(res, error, BAD_REQUEST, "User not found!")
         }
     } catch (err) {
         console.log(err)
         return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
-    }*/
+    }
 }
 
 /*
  * NAME - confirmBVN
  * @REQUEST METHOD - POST
- * AIM - confirm user bvn with sent code to user's phone
+ * AIM - confirm user active phone with sent code to user's phone
  * If code matches, update bvnConfirmed field else don't update
  */
-const confirmBVN = async (req: Request, res: Response): Promise<Response | void> => {
+const confirmUserVerification = async (req: Request, res: Response): Promise<Response | void> => {
     let userData
-    const { bvnOtp } = req.body
+    const { otp } = req.body
 
-    if (isEmpty(bvnOtp.toString())) return handleResponse(res, error, BAD_REQUEST, "BVN cannot be empty..")
-    if (typeof bvnOtp === "string") return handleResponse(res, error, BAD_REQUEST, "OTP must be a valid number")
+    if (isEmpty(otp.toString())) return handleResponse(res, error, BAD_REQUEST, "OTP cannot be empty..")
 
     try {
-        userData = await User.findOne({ bvnOtp })
+        userData = await User.findOne({ bvnOtp: otp })
         if (userData) {
             userData.bvnConfirmed = true
             await userData.save()
-            return handleResponse(res, success, OK, "Bvn linked successfully")
+            return handleResponse(res, success, OK, "Phone number linked successfully")
         } else {
-            return handleResponse(res, success, OK, "Invalid OTP provided")
+            return handleResponse(res, error, BAD_REQUEST, "Invalid OTP provided")
         }
     } catch (err) {
         console.log(err)
@@ -474,8 +447,8 @@ export {
     updatePassword,
     activateUser,
     getUser,
-    confirmBVN,
-    addBVN,
+    confirmUserVerification,
+    VerifyUser,
     resetPassword,
     requestForFund,
     updateAccountDetails,

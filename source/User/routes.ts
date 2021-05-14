@@ -9,10 +9,10 @@ import {
     updateAccountDetails,
     getUser,
     requestForFund,
-    addBVN,
+    VerifyUser,
     autoSave,
     switchAutoSave,
-    confirmBVN,
+    confirmUserVerification,
     checkCron
 } from "./index"
 import { auth } from "../Authentication"
@@ -24,8 +24,8 @@ router.get("/details", auth, getUser)
 router.delete("/", deleteAllUser)
 router.get("/check-cron", checkCron)
 router.post("/activate", auth, activateUser)
-router.post("/bvn", auth, addBVN)
-router.post("/bvn/confirm", auth, confirmBVN)
+router.put("/verify-user", auth, VerifyUser)
+router.post("/verify-user-otp", auth, confirmUserVerification)
 router.put("/photo", auth, updateProfilePhoto)
 router.put("/account", auth, updateAccountDetails)
 router.post("/request-fund", auth, requestForFund)
