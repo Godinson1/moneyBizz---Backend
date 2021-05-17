@@ -94,7 +94,7 @@ const sendTransactionMail = (
     })
 }
 
-const sendMobileOTP = async (data: number, phone: string): Promise<void> => {
+const sendMobileOTP = async (data: number | undefined, phone: string | undefined): Promise<void> => {
     const accountSid = process.env.TWILIO_ACCOUNT_SID
     const authToken = process.env.TWILIO_AUTH_TOKEN
 
@@ -104,7 +104,7 @@ const sendMobileOTP = async (data: number, phone: string): Promise<void> => {
         .create({
             body: `Your bizz code is - ${data}`,
             from: process.env.TWILIO_PHONE_NUMBER,
-            to: phone
+            to: phone as string
         })
         .then((message) => console.log(message.sid))
         .catch((error) => console.log(error))

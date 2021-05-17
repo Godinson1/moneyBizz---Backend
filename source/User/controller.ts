@@ -122,16 +122,16 @@ const VerifyUser = async (req: Request, res: Response): Promise<Response> => {
 
     try {
         userData = await findUserByHandle(req.user.handle)
-        if (userData !== null) {
+        if (userData) {
             userData = await User.findOne({ handle: req.user.handle })
-            userData.dateOfBirth = dateOfBirth
-            userData.phone = phone.toString()
-            userData.sex = sex
-            userData.address = address
-            userData.stateOfOrigin = stateOrigin
-            userData.bvnOtp = uniqueCode()
+            userData!.dateOfBirth = dateOfBirth
+            userData!.phone = phone.toString()
+            userData!.sex = sex
+            userData!.address = address
+            userData!.stateOfOrigin = stateOrigin
+            userData!.bvnOtp = uniqueCode()
             const updatedUserData = await userData?.save()
-            await sendMobileOTP(updatedUserData.bvnOtp, validatePhone(updatedUserData.phone))
+            await sendMobileOTP(updatedUserData?.bvnOtp, validatePhone(updatedUserData?.phone))
             return handleResponse(
                 res,
                 success,
