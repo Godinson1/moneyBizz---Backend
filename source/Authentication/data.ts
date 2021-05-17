@@ -101,9 +101,9 @@ const validateAmount = (data: string): number => {
     return parseInt(result)
 }
 
-const validatePhone = (data: string): string => {
+const validatePhone = (data: string | undefined): string => {
     const phoneSignal = "+234"
-    const newResult = data.toString().slice(1)
+    const newResult = (data as string).toString().slice(1)
     return `${phoneSignal}${newResult}`
 }
 

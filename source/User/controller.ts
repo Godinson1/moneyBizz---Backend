@@ -122,7 +122,7 @@ const VerifyUser = async (req: Request, res: Response): Promise<Response> => {
 
     try {
         userData = await findUserByHandle(req.user.handle)
-        if (userData) {
+        if (userData !== null) {
             userData = await User.findOne({ handle: req.user.handle })
             userData!.dateOfBirth = dateOfBirth
             userData!.phone = phone.toString()
