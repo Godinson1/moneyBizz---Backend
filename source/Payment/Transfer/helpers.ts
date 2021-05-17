@@ -18,7 +18,7 @@ const bizzRecipients = async (array: Array<{ handle: string }>): Promise<Array<b
                 currency: "NGN"
             })
         } else {
-            return `User with ${array[i].handle} does not exist`
+            return `User with @${array[i].handle} does not exist.`
         }
     }
     return addedMembers
