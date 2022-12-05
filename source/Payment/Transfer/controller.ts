@@ -77,7 +77,7 @@ const singleTransfer = async (req: Request, res: Response): Promise<Response | v
                     return handleResponse(res, success, OK, `You successfully sent money to ${bizzerData.handle}`)
                 }
             }
-        } catch (err) {
+        } catch (err: any) {
             return handleResponse(res, error, BAD_REQUEST, err.response.data.message)
         }
     } catch (err) {
@@ -149,7 +149,7 @@ const bulkTransfer = async (req: Request, res: Response): Promise<Response | voi
                         )
                     }
                 }
-            } catch (err) {
+            } catch (err: any) {
                 return handleResponse(res, error, BAD_REQUEST, err.response.data.message)
             }
         } catch (err) {

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import DeviceDetector, { ResultBot } from "node-device-detector"
 import { connectToTestDB, userData, regData, closeDBConnection, signInTestUser } from "./test"
+import { ErrorResponse } from "./error/error"
 
 const deviceDetector = new DeviceDetector()
 
@@ -79,5 +80,6 @@ export {
     GMAIL,
     signInTestUser,
     PHOTO_URL,
-    APPROVED
+    APPROVED,
+    ErrorResponse
 }

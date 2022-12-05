@@ -38,11 +38,11 @@ const confirmOtp = async (req: Request, res: Response): Promise<Response> => {
             } else {
                 return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
             }
-        } catch (err) {
+        } catch (err: any) {
             console.log(err)
             return res.status(BAD_REQUEST).json({
                 status: error,
-                message: err.response?.data
+                message: err?.response?.data
             })
         }
     } catch (err) {

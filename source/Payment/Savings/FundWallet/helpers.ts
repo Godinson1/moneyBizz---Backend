@@ -78,7 +78,7 @@ const chargeUser = async (userData: IUser | null, req: Request, amount: string):
             await createTransaction(userData, req, amount.toString(), chargeResponse.data.data.reference, type.FUND)
         }
         return chargeResponse
-    } catch (err) {
+    } catch (err: any) {
         console.log(err)
         return err.response.data.message
     }

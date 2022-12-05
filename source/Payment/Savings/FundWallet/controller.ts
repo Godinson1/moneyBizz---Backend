@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { IUser, User } from "../../../models"
@@ -55,7 +56,7 @@ const fundAccountWithBankAccount = async (req: Request, res: Response): Promise<
                 message: "Payment attempted successfully",
                 data: chargeResponse.data
             })
-        } catch (err) {
+        } catch (err: any) {
             return handleResponse(res, error, BAD_REQUEST, err.response.data.message)
         }
     } catch (err) {
@@ -94,7 +95,7 @@ const fundAccountWithCard = async (req: Request, res: Response): Promise<Respons
                 message: "Payment attempted successfully",
                 data: chargeResponse.data
             })
-        } catch (err) {
+        } catch (err: any) {
             return handleResponse(res, error, BAD_REQUEST, err.response.data.message)
         }
     } catch (err) {
@@ -143,7 +144,7 @@ const fundAccountWithExistingCard = async (req: Request, res: Response): Promise
                     "Authorization not found. Kindly initiate a transaction to get one."
                 )
             }
-        } catch (err) {
+        } catch (err: any) {
             console.log(err)
             return handleResponse(res, error, BAD_REQUEST, err.response.data.message)
         }
@@ -216,7 +217,7 @@ const debitAccount = async (req: Request, res: Response): Promise<Response | voi
 
                 return handleResponse(res, success, OK, "Bizz wallet debited successfully")
             }
-        } catch (err) {
+        } catch (err: any) {
             return handleResponse(res, error, BAD_REQUEST, err.response.data.message)
         }
     } catch (err) {
@@ -268,7 +269,7 @@ const autoFundAccount = async (req: Request, res: Response): Promise<Response | 
                     "Authorization not found. Kindly initiate a transaction to get one."
                 )
             }
-        } catch (err) {
+        } catch (err: any) {
             console.log(err)
             return handleResponse(res, error, BAD_REQUEST, err.response.data.message)
         }
