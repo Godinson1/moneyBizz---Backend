@@ -4,7 +4,7 @@
     "description": "A financial app that helps user save and invest.",
     "main": "index.js",
     "engines": {
-        "node": "14.5.0",
+        "node": ">=14.5.0",
         "npm": "6.12.0"
     },
     "scripts": {
