@@ -10,6 +10,7 @@
     "scripts": {
         "start": "ts-node --files source/server.ts",
         "dev": "nodemon",
+        "build": "tsc",
         "test": "jest --runInBand --detectOpenHandles --forceExit"
     },
     "keywords": [],
