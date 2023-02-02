@@ -1,13 +1,14 @@
 import { Request, Response } from "express"
 import { User, IUser, Transaction } from "../models"
 import { StatusCodes } from "http-status-codes"
+import { v2 as cloudinary } from "cloudinary"
 
 import { isEmail, isEmpty, validateResetPassword } from "../validations"
 import { findUserByHandle, findAllByHandle } from "../Payment"
 import { handleResponse, error, success, type } from "../Utility"
 import { bizzCode, uniqueCode, sendMobileOTP, validatePhone, sendAuthMail } from "../Authentication"
 import bcrypt from "bcryptjs"
-import { uploadImage } from "./index"
+import { uploadImageCloudinary } from "./index"
 import { UploadedFile } from "express-fileupload"
 import * as schedule from "node-schedule"
 import { createNotification } from "../Payment/Savings"
@@ -124,14 +125,17 @@ const VerifyUser = async (req: Request, res: Response): Promise<Response> => {
         userData = await findUserByHandle(req.user.handle)
         if (userData !== null) {
             userData = await User.findOne({ handle: req.user.handle })
-            userData!.dateOfBirth = dateOfBirth
-            userData!.phone = phone.toString()
-            userData!.sex = sex
-            userData!.address = address
-            userData!.stateOfOrigin = stateOrigin
-            userData!.bvnOtp = uniqueCode()
-            const updatedUserData = await userData?.save()
-            await sendMobileOTP(updatedUserData?.bvnOtp, validatePhone(updatedUserData?.phone))
+            if (userData) {
+                userData.dateOfBirth = dateOfBirth
+                userData.phone = phone.toString()
+                userData.sex = sex
+                userData.address = address
+                userData.stateOfOrigin = stateOrigin
+                userData.bvnOtp = uniqueCode()
+
+                const updatedUserData = await userData?.save()
+                await sendMobileOTP(updatedUserData?.bvnOtp, validatePhone(updatedUserData?.phone))
+            }
             return handleResponse(
                 res,
                 success,
@@ -229,11 +233,10 @@ const updatePassword = async (req: Request, res: Response): Promise<Response | v
         userData = await User.findOne({ mbCode })
 
         if (userData) {
-            userData.password = password
             bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(userData!.password, salt, async (err, hash) => {
+                bcrypt.hash(password, salt, async (err, hash) => {
                     if (err) throw err
-                    userData!.password = hash
+                    if (userData) userData.password = hash
                     await userData?.save()
                     return handleResponse(res, success, OK, "Password updated successfully!")
                 })
@@ -245,6 +248,21 @@ const updatePassword = async (req: Request, res: Response): Promise<Response | v
         console.log(err)
         return handleResponse(res, error, INTERNAL_SERVER_ERROR, "Something went wrong")
     }
+}
+
+/*
+ * NAME - getProfilePhotoSignature
+ * @REQUEST METHOD - GET
+ * AIM - Get signature before uploading user's profile photo
+ */
+const getProfilePhotoSignature = async (req: Request, res: Response): Promise<Response> => {
+    const timestamp = Math.round(new Date().getTime() / 1000)
+    const signature = await cloudinary.utils.api_sign_request({ timestamp }, `${process.env.cloudinarySecretKey}`)
+    return res.status(OK).json({
+        status: success,
+        message: "Profile photo signature generated successfully..",
+        data: { timestamp, signature }
+    })
 }
 
 /*
@@ -265,10 +283,10 @@ const updateProfilePhoto = async (req: Request, res: Response): Promise<Response
             if (!prefferedTypes.includes(image.mimetype) && userData !== null)
                 return handleResponse(res, error, BAD_REQUEST, "Please select a valid photo")
             //Upload image
-            const url = await uploadImage(image)
+            const url = await uploadImageCloudinary(image)
             //Find authenticated user and update photo here
             userData = await findUserByHandle(req.user.handle)
-            userData!.profile_photo = url
+            if (userData) userData.profile_photo = url
             const data = await userData?.save()
             return res.status(OK).json({
                 status: success,
@@ -455,5 +473,6 @@ export {
     autoSave,
     switchAutoSave,
     getTransactions,
-    checkCron
+    checkCron,
+    getProfilePhotoSignature
 }

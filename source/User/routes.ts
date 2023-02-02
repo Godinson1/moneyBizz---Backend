@@ -13,7 +13,8 @@ import {
     autoSave,
     switchAutoSave,
     confirmUserVerification,
-    checkCron
+    checkCron,
+    getProfilePhotoSignature
 } from "./index"
 import { auth } from "../Authentication"
 
@@ -32,6 +33,7 @@ router.post("/request-fund", auth, requestForFund)
 router.post("/password/reset", resetPassword)
 router.post("/password/update", updatePassword)
 router.put("/autosave", auth, autoSave)
+router.get("/signature", auth, getProfilePhotoSignature)
 router.put("/autosave/switch", auth, switchAutoSave)
 
 export { router }

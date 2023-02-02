@@ -48,12 +48,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     next(error)
 })
 
-//Error handler helper
-app.use((err: { statusCode: number; message: string }, req: Request, res: Response, next: NextFunction) => {
-    handleError({ statusCode: HttpStatus.NOT_FOUND, message: "Route not found!" }, res)
-    next()
-})
-
 // setting fall back message for other uncaught errors
 app.use((error: { message: string; status: number }, req: Request, res: Response, next: NextFunction) => {
     res.status(error.status || HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -61,6 +55,12 @@ app.use((error: { message: string; status: number }, req: Request, res: Response
             message: error.message
         }
     })
+    next()
+})
+
+//Error handler helper
+app.use((err: { statusCode: number; message: string }, req: Request, res: Response, next: NextFunction) => {
+    handleError({ statusCode: HttpStatus.NOT_FOUND, message: "Route not found!" }, res)
     next()
 })
 

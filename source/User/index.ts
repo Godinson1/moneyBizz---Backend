@@ -12,10 +12,11 @@ import {
     autoSave,
     checkCron,
     switchAutoSave,
-    requestForFund
+    requestForFund,
+    getProfilePhotoSignature
 } from "./controller"
 import { router } from "./routes"
-import { uploadImage } from "./helpers"
+import { uploadImage, uploadImageCloudinary } from "./helpers"
 
 export {
     getAllUser,
@@ -33,5 +34,7 @@ export {
     VerifyUser,
     confirmUserVerification,
     uploadImage,
-    checkCron
+    checkCron,
+    getProfilePhotoSignature,
+    uploadImageCloudinary
 }

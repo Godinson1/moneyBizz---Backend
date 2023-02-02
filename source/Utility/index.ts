@@ -51,7 +51,7 @@ const success = "success"
 const source = "balance"
 const GMAIL = "gmail"
 const APPROVED = "Approved"
-const PHOTO_URL = "https://storage.googleapis.com/bizz_bucket/noimg.png"
+const PHOTO_URL = "https://res.cloudinary.com/moneybizz/image/upload/v1675363539/Images/zl1wmpqhl5wwzwsyjnow.png"
 const type = {
     WELCOME: "welcome",
     TRANSFER: "transfer",
