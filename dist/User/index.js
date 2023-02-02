@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkCron = exports.uploadImage = exports.confirmUserVerification = exports.VerifyUser = exports.getUser = exports.updatePassword = exports.activateUser = exports.resetPassword = exports.deleteAllUser = exports.router = exports.requestForFund = exports.updateAccountDetails = exports.updateProfilePhoto = exports.switchAutoSave = exports.autoSave = exports.getAllUser = void 0;
+exports.uploadImageCloudinary = exports.getProfilePhotoSignature = exports.checkCron = exports.uploadImage = exports.confirmUserVerification = exports.VerifyUser = exports.getUser = exports.updatePassword = exports.activateUser = exports.resetPassword = exports.deleteAllUser = exports.router = exports.requestForFund = exports.updateAccountDetails = exports.updateProfilePhoto = exports.switchAutoSave = exports.autoSave = exports.getAllUser = void 0;
 const controller_1 = require("./controller");
 Object.defineProperty(exports, "getAllUser", { enumerable: true, get: function () { return controller_1.getAllUser; } });
 Object.defineProperty(exports, "deleteAllUser", { enumerable: true, get: function () { return controller_1.deleteAllUser; } });
@@ -16,7 +16,9 @@ Object.defineProperty(exports, "autoSave", { enumerable: true, get: function () 
 Object.defineProperty(exports, "checkCron", { enumerable: true, get: function () { return controller_1.checkCron; } });
 Object.defineProperty(exports, "switchAutoSave", { enumerable: true, get: function () { return controller_1.switchAutoSave; } });
 Object.defineProperty(exports, "requestForFund", { enumerable: true, get: function () { return controller_1.requestForFund; } });
+Object.defineProperty(exports, "getProfilePhotoSignature", { enumerable: true, get: function () { return controller_1.getProfilePhotoSignature; } });
 const routes_1 = require("./routes");
 Object.defineProperty(exports, "router", { enumerable: true, get: function () { return routes_1.router; } });
 const helpers_1 = require("./helpers");
 Object.defineProperty(exports, "uploadImage", { enumerable: true, get: function () { return helpers_1.uploadImage; } });
+Object.defineProperty(exports, "uploadImageCloudinary", { enumerable: true, get: function () { return helpers_1.uploadImageCloudinary; } });

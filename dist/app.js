@@ -41,11 +41,6 @@ app.use((req, res, next) => {
     error.status = http_status_codes_1.default.NOT_FOUND;
     next(error);
 });
-//Error handler helper
-app.use((err, req, res, next) => {
-    (0, index_1.handleError)({ statusCode: http_status_codes_1.default.NOT_FOUND, message: "Route not found!" }, res);
-    next();
-});
 // setting fall back message for other uncaught errors
 app.use((error, req, res, next) => {
     res.status(error.status || http_status_codes_1.default.INTERNAL_SERVER_ERROR).json({
@@ -53,5 +48,10 @@ app.use((error, req, res, next) => {
             message: error.message
         }
     });
+    next();
+});
+//Error handler helper
+app.use((err, req, res, next) => {
+    (0, index_1.handleError)({ statusCode: http_status_codes_1.default.NOT_FOUND, message: "Route not found!" }, res);
     next();
 });

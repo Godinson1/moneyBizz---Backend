@@ -22,4 +22,5 @@ router.post("/request-fund", Authentication_1.auth, index_1.requestForFund);
 router.post("/password/reset", index_1.resetPassword);
 router.post("/password/update", index_1.updatePassword);
 router.put("/autosave", Authentication_1.auth, index_1.autoSave);
+router.get("/signature", Authentication_1.auth, index_1.getProfilePhotoSignature);
 router.put("/autosave/switch", Authentication_1.auth, index_1.switchAutoSave);

@@ -64,7 +64,7 @@ const GMAIL = "gmail";
 exports.GMAIL = GMAIL;
 const APPROVED = "Approved";
 exports.APPROVED = APPROVED;
-const PHOTO_URL = "https://storage.googleapis.com/bizz_bucket/noimg.png";
+const PHOTO_URL = "https://res.cloudinary.com/moneybizz/image/upload/v1675363539/Images/zl1wmpqhl5wwzwsyjnow.png";
 exports.PHOTO_URL = PHOTO_URL;
 const type = {
     WELCOME: "welcome",

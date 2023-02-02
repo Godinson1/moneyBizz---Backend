@@ -35,9 +35,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkCron = exports.getTransactions = exports.switchAutoSave = exports.autoSave = exports.updateAccountDetails = exports.requestForFund = exports.resetPassword = exports.VerifyUser = exports.confirmUserVerification = exports.getUser = exports.activateUser = exports.updatePassword = exports.updateProfilePhoto = exports.deleteAllUser = exports.getAllUser = void 0;
+exports.getProfilePhotoSignature = exports.checkCron = exports.getTransactions = exports.switchAutoSave = exports.autoSave = exports.updateAccountDetails = exports.requestForFund = exports.resetPassword = exports.VerifyUser = exports.confirmUserVerification = exports.getUser = exports.activateUser = exports.updatePassword = exports.updateProfilePhoto = exports.deleteAllUser = exports.getAllUser = void 0;
 const models_1 = require("../models");
 const http_status_codes_1 = require("http-status-codes");
+const cloudinary_1 = require("cloudinary");
 const validations_1 = require("../validations");
 const Payment_1 = require("../Payment");
 const Utility_1 = require("../Utility");
@@ -160,14 +161,16 @@ const VerifyUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         userData = yield (0, Payment_1.findUserByHandle)(req.user.handle);
         if (userData !== null) {
             userData = yield models_1.User.findOne({ handle: req.user.handle });
-            userData.dateOfBirth = dateOfBirth;
-            userData.phone = phone.toString();
-            userData.sex = sex;
-            userData.address = address;
-            userData.stateOfOrigin = stateOrigin;
-            userData.bvnOtp = (0, Authentication_1.uniqueCode)();
-            const updatedUserData = yield (userData === null || userData === void 0 ? void 0 : userData.save());
-            yield (0, Authentication_1.sendMobileOTP)(updatedUserData === null || updatedUserData === void 0 ? void 0 : updatedUserData.bvnOtp, (0, Authentication_1.validatePhone)(updatedUserData === null || updatedUserData === void 0 ? void 0 : updatedUserData.phone));
+            if (userData) {
+                userData.dateOfBirth = dateOfBirth;
+                userData.phone = phone.toString();
+                userData.sex = sex;
+                userData.address = address;
+                userData.stateOfOrigin = stateOrigin;
+                userData.bvnOtp = (0, Authentication_1.uniqueCode)();
+                const updatedUserData = yield (userData === null || userData === void 0 ? void 0 : userData.save());
+                yield (0, Authentication_1.sendMobileOTP)(updatedUserData === null || updatedUserData === void 0 ? void 0 : updatedUserData.bvnOtp, (0, Authentication_1.validatePhone)(updatedUserData === null || updatedUserData === void 0 ? void 0 : updatedUserData.phone));
+            }
             return (0, Utility_1.handleResponse)(res, Utility_1.success, OK, "Phone number verified successfully, Please enter Otp to confirm ownership.");
         }
         else {
@@ -259,12 +262,12 @@ const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         userData = yield models_1.User.findOne({ mbCode });
         if (userData) {
-            userData.password = password;
             bcryptjs_1.default.genSalt(10, (err, salt) => {
-                bcryptjs_1.default.hash(userData.password, salt, (err, hash) => __awaiter(void 0, void 0, void 0, function* () {
+                bcryptjs_1.default.hash(password, salt, (err, hash) => __awaiter(void 0, void 0, void 0, function* () {
                     if (err)
                         throw err;
-                    userData.password = hash;
+                    if (userData)
+                        userData.password = hash;
                     yield (userData === null || userData === void 0 ? void 0 : userData.save());
                     return (0, Utility_1.handleResponse)(res, Utility_1.success, OK, "Password updated successfully!");
                 }));
@@ -280,6 +283,21 @@ const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.updatePassword = updatePassword;
+/*
+ * NAME - getProfilePhotoSignature
+ * @REQUEST METHOD - GET
+ * AIM - Get signature before uploading user's profile photo
+ */
+const getProfilePhotoSignature = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    const signature = yield cloudinary_1.v2.utils.api_sign_request({ timestamp }, `${process.env.cloudinarySecretKey}`);
+    return res.status(OK).json({
+        status: Utility_1.success,
+        message: "Profile photo signature generated successfully..",
+        data: { timestamp, signature }
+    });
+});
+exports.getProfilePhotoSignature = getProfilePhotoSignature;
 /*
  * NAME - updateProfilePhoto
  * @REQUEST METHOD - PUT
@@ -297,10 +315,11 @@ const updateProfilePhoto = (req, res) => __awaiter(void 0, void 0, void 0, funct
             if (!prefferedTypes.includes(image.mimetype) && userData !== null)
                 return (0, Utility_1.handleResponse)(res, Utility_1.error, BAD_REQUEST, "Please select a valid photo");
             //Upload image
-            const url = yield (0, index_1.uploadImage)(image);
+            const url = yield (0, index_1.uploadImageCloudinary)(image);
             //Find authenticated user and update photo here
             userData = yield (0, Payment_1.findUserByHandle)(req.user.handle);
-            userData.profile_photo = url;
+            if (userData)
+                userData.profile_photo = url;
             const data = yield (userData === null || userData === void 0 ? void 0 : userData.save());
             return res.status(OK).json({
                 status: Utility_1.success,
